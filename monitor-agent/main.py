@@ -1,33 +1,39 @@
-# import uvicorn
 import requests
+import uvicorn
+import logging
 import time
+import json
 import os
-from timeloop import Timeloop
+import typing
 from datetime import timedelta
+from fastapi import FastAPI
+from fastapi_utils.tasks import repeat_every
+from .core.settings import settings
+from .core.models.metrics import Status, MetricDynamic, MetricStatic
 
-# from fastapi import FastAPI
-from core.settings import settings
-from core.models.metrics import Status, MetricDynamic, MetricStatic
+
+logger = logging.getLogger(__name__)
+api = FastAPI()
 
 
-def execution_time_decorator(function) -> tuple[float, dict]:
+def execution_time_decorator(function) -> typing.Tuple[float, dict]:
     start_time = time.time()
     data = function().__dict__
     end_time = time.time() - start_time
     return round(end_time, 2), data
 
 
-def static() -> tuple[dict, dict]:
+def static() -> typing.Tuple[dict, dict]:
     static_time, static_data = execution_time_decorator(MetricStatic)
     return {"static": static_time}, static_data
 
 
-def dynamic() -> tuple[dict, dict]:
+def dynamic() -> typing.Tuple[dict, dict]:
     dynamic_time, dynamic_data = execution_time_decorator(MetricDynamic)
     return {"dynamic": dynamic_time}, dynamic_data
 
 
-def make_request_adapter(function_list: list) -> tuple[dict, dict]:
+def make_request_adapter(function_list: list) -> typing.Tuple[dict, dict]:
     elapsed_time = {}
     data = {}
     for function in function_list:
@@ -45,31 +51,27 @@ def make_request(elapsed_time: dict, data: dict):
     status = Status(elapsed=elapsed_time).__dict__
     json_request = {"data": data, "status": status}
     r = requests.post(settings.metrics_URL, json=json_request)
-    print(r.json())
+    # DEBUG
+    # print(r.status_code)
+    # with open(settings.metrics_file, "w") as f:
+    #     f.write(json.dumps(json_request, indent=4, sort_keys=True))
 
 
-#######################################
+@api.get("/")
+async def root():
+    return {"message": "Hello World"}
 
-# app = FastAPI()
 
-# @app.get("/")
-# async def root():
-#     return {"message": "Hello World"}
-
-# def start():
-#     """Launched with `poetry run start` at root level"""
-#     uvicorn.run("monitor-agent.main:app", host=settings.host, port=settings.port, reload=settings.reload)
-
-if __name__ == "__main__":
-    # Ref: https://medium.com/greedygame-engineering/an-elegant-way-to-run-periodic-tasks-in-python-61b7c477b679
-    # tl = Timeloop()
-
-    # @tl.job(interval=timedelta(seconds=settings.post_task_interval))
-    # def make_request_task():
-    #     elapsed_time, data = make_request_adapter([static, dynamic])
-    #     make_request(elapsed_time=elapsed_time, data=data)
-
-    # tl.start(block=True)
-
+@api.on_event("startup")
+@repeat_every(seconds=settings.post_task_interval, logger=logger, wait_first=True)
+def periodic():
+    # https://github.com/tiangolo/fastapi/issues/520
+    # https://fastapi-utils.davidmontague.xyz/user-guide/repeated-tasks/#the-repeat_every-decorator
+    # Changed Timeloop for this
     elapsed_time, data = make_request_adapter([static, dynamic])
     make_request(elapsed_time=elapsed_time, data=data)
+
+
+def start():
+    """Launched with `poetry run start` at root level"""
+    uvicorn.run("monitor-agent.main:api", host=settings.host, port=settings.port, reload=settings.reload)
