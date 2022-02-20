@@ -8,6 +8,7 @@ class Settings(BaseSettings):
     metrics_URL: str = "http://httpbin.org/post"
     alerts_URL: str = ""
     post_task_interval: int = 60
+    metrics_file: str = "metrics.json"
 
 
 settings = Settings()
