@@ -5,7 +5,7 @@ description = "Monitor agent that sends and receives metrics and info from the R
 authors = ["Pablo González Rubio <pjgr2000@gmail.com>"]
 license = "GNU General Public License v3.0"
 packages = [
-    { include = "monitor-agent" },
+    { include = "monitor-agent"},
     { include = "monitor-agent/**/*.py" },
 ]
 
@@ -15,17 +15,17 @@ start = "monitor-agent.main:start"
 [tool.poetry.dependencies]
 python = ">=3.7,<4.0.0"
 requests = "^2.27.1"
-# https://python-poetry.org/docs/dependency-specification/#using-environment-markers
 psutil = "^5.9.0"
 fastapi = "^0.74.0"
 uvicorn = "^0.17.4"
-gunicorn = "^20.1.0"
 pydantic = "^1.9.0"
-timeloop = "^1.0.2"
+fastapi-utils = "^0.2.1"
 
 [tool.poetry.dev-dependencies]
 pytest = "^7.0.0"
 tox = "^3.24.5"
+pre-commit-hooks = "^4.1.0"
+pre-commit = "^2.17.0"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
