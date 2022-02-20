@@ -74,4 +74,9 @@ def periodic():
 
 def start():
     """Launched with `poetry run start` at root level"""
-    uvicorn.run("monitor-agent.main:api", host=settings.host, port=settings.port, reload=settings.reload)
+    uvicorn.run(
+        "monitor-agent.main:api",
+        host=settings.host,
+        port=settings.port,
+        reload=settings.reload,
+    )
