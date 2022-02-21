@@ -1,16 +1,31 @@
 import subprocess
+import typing
+import time
 import os
-
 
 class Command:
     def __init__(self, command: str, timeout: int):
         self.command = command
-        self.stdout, self.stderr, self.timeout = _executeCommand(command, timeout)
+        self.stdout, self.stderr, self.timeout, self.elapsed_time = _executeCommand(command, timeout)
 
 
-def _executeCommand(command: str, timeout: int):
+def _executeCommand(command: str, timeout: int) -> typing.Tuple[str, str, int, float]:
+    """Executes a command in a maximum time set by a timeout.
+
+    Args:
+        command (str): Command to execute
+        timeout (int): Maximum time the command can take to finish
+
+    Returns:
+        stdout (str): Standard Output of the command
+        stderr (str): Standard Error of the command
+        timeout (int): Maximum time the command can take to finish
+        elapsed_time (float): Time that the command took to finish
+    """    
     # You should NOT use shell=True on Linux:
     # os.path.expandvars("$PATH")
+    end_time = 0.0
+    start_time = time.time()
     try:
         if os.name == 'nt':
             # UTF-8 Codec can't decode bytes
@@ -23,11 +38,12 @@ def _executeCommand(command: str, timeout: int):
     except subprocess.TimeoutExpired as msg:
         process = msg
     except ValueError as msg:
-        return None, str(msg), timeout
+        return "", str(msg), timeout, round(time.time() - start_time, 2)
     except FileNotFoundError as msg:
-        return None, str(msg), timeout
+        return "", str(msg), timeout, round(time.time() - start_time, 2)
     
+    end_time = round(time.time() - start_time, 2)
     try:
-        return process.stdout, process.stderr, process.timeout
+        return process.stdout, process.stderr, process.timeout, end_time
     except AttributeError:
-        return process.stdout, process.stderr, timeout
+        return process.stdout, process.stderr, timeout, end_time
