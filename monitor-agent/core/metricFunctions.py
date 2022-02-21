@@ -4,6 +4,9 @@ import requests
 from ..settings import settings
 from .models.metricModel import Status, MetricDynamic, MetricStatic
 
+# Typing Tuple is used to overcome Python ^3.6 until Python 3.10 problem
+# with Tuples not being a standard type
+
 
 def execution_time_decorator(function) -> typing.Tuple[float, dict]:
     start_time = time.time()
