@@ -1,0 +1,243 @@
+{
+    "data": {
+        "architecture": "AMD64",
+        "battery": null,
+        "boot_date": "2022-02-20T17:27:04.436997",
+        "cpu_core_physical": 4,
+        "cpu_core_total": 8,
+        "cpu_freq": {
+            "current": 1900.0,
+            "max": 4001.0,
+            "min": 0.0
+        },
+        "cpu_percent": 7.2,
+        "disk": {
+            "C:\\": {
+                "free": "114.28GB",
+                "percent": 48.7,
+                "total": "222.95GB",
+                "used": "108.67GB"
+            },
+            "D:\\": {
+                "free": "8.28GB",
+                "percent": 92.6,
+                "total": "111.79GB",
+                "used": "103.51GB"
+            },
+            "E:\\": {
+                "free": "1.66TB",
+                "percent": 8.9,
+                "total": "1.82TB",
+                "used": "166.68GB"
+            }
+        },
+        "disk_percent": 0.02,
+        "host": "DESKTOP-82K1C4C",
+        "ip": {
+            "Conexi\u00f3n de red Bluetooth": {
+                "00-A6-17-30-0C-E9": {
+                    "broadcast": null,
+                    "family": -1,
+                    "netmask": null,
+                    "ptp": null
+                },
+                "169.254.227.148": {
+                    "broadcast": null,
+                    "family": 2,
+                    "netmask": "255.255.0.0",
+                    "ptp": null
+                },
+                "fe80::d9af:8cb6:a626:e394": {
+                    "broadcast": null,
+                    "family": 23,
+                    "netmask": null,
+                    "ptp": null
+                }
+            },
+            "Conexi\u00f3n de \u00e1rea local* 1": {
+                "0A-62-66-BC-6C-A2": {
+                    "broadcast": null,
+                    "family": -1,
+                    "netmask": null,
+                    "ptp": null
+                },
+                "169.254.205.145": {
+                    "broadcast": null,
+                    "family": 2,
+                    "netmask": "255.255.0.0",
+                    "ptp": null
+                },
+                "fe80::15f4:d829:28a:cd91": {
+                    "broadcast": null,
+                    "family": 23,
+                    "netmask": null,
+                    "ptp": null
+                }
+            },
+            "Conexi\u00f3n de \u00e1rea local* 10": {
+                "0A-62-66-BC-64-A2": {
+                    "broadcast": null,
+                    "family": -1,
+                    "netmask": null,
+                    "ptp": null
+                },
+                "169.254.155.106": {
+                    "broadcast": null,
+                    "family": 2,
+                    "netmask": "255.255.0.0",
+                    "ptp": null
+                },
+                "fe80::e0fc:aaf9:f987:9b6a": {
+                    "broadcast": null,
+                    "family": 23,
+                    "netmask": null,
+                    "ptp": null
+                }
+            },
+            "Ethernet": {
+                "169.254.49.209": {
+                    "broadcast": null,
+                    "family": 2,
+                    "netmask": "255.255.0.0",
+                    "ptp": null
+                },
+                "30-5A-3A-02-4B-E5": {
+                    "broadcast": null,
+                    "family": -1,
+                    "netmask": null,
+                    "ptp": null
+                },
+                "fe80::ed82:be2a:ee02:31d1": {
+                    "broadcast": null,
+                    "family": 23,
+                    "netmask": null,
+                    "ptp": null
+                }
+            },
+            "Loopback Pseudo-Interface 1": {
+                "127.0.0.1": {
+                    "broadcast": null,
+                    "family": 2,
+                    "netmask": "255.0.0.0",
+                    "ptp": null
+                },
+                "::1": {
+                    "broadcast": null,
+                    "family": 23,
+                    "netmask": null,
+                    "ptp": null
+                }
+            },
+            "VMware Network Adapter VMnet1": {
+                "00-50-56-C0-00-01": {
+                    "broadcast": null,
+                    "family": -1,
+                    "netmask": null,
+                    "ptp": null
+                },
+                "192.168.220.1": {
+                    "broadcast": null,
+                    "family": 2,
+                    "netmask": "255.255.255.0",
+                    "ptp": null
+                },
+                "fe80::8ff:5342:fb05:86f": {
+                    "broadcast": null,
+                    "family": 23,
+                    "netmask": null,
+                    "ptp": null
+                }
+            },
+            "VMware Network Adapter VMnet8": {
+                "00-50-56-C0-00-08": {
+                    "broadcast": null,
+                    "family": -1,
+                    "netmask": null,
+                    "ptp": null
+                },
+                "192.168.91.1": {
+                    "broadcast": null,
+                    "family": 2,
+                    "netmask": "255.255.255.0",
+                    "ptp": null
+                },
+                "fe80::2de3:841f:7268:f762": {
+                    "broadcast": null,
+                    "family": 23,
+                    "netmask": null,
+                    "ptp": null
+                }
+            },
+            "Wi-Fi": {
+                "08-62-66-BC-6C-A2": {
+                    "broadcast": null,
+                    "family": -1,
+                    "netmask": null,
+                    "ptp": null
+                },
+                "192.168.1.15": {
+                    "broadcast": null,
+                    "family": 2,
+                    "netmask": "255.255.255.0",
+                    "ptp": null
+                },
+                "fe80::11a0:c700:2a63:24a8": {
+                    "broadcast": null,
+                    "family": 23,
+                    "netmask": null,
+                    "ptp": null
+                }
+            },
+            "vEthernet (Default Switch)": {
+                "00-15-5D-7F-1D-49": {
+                    "broadcast": null,
+                    "family": -1,
+                    "netmask": null,
+                    "ptp": null
+                },
+                "172.29.240.1": {
+                    "broadcast": null,
+                    "family": 2,
+                    "netmask": "255.255.240.0",
+                    "ptp": null
+                },
+                "fe80::8d75:dcfa:a36:4847": {
+                    "broadcast": null,
+                    "family": 23,
+                    "netmask": null,
+                    "ptp": null
+                }
+            }
+        },
+        "network_current_in": "174.00B",
+        "network_current_out": "500.00B",
+        "network_total_in": "211.97MB",
+        "network_total_out": "16.77MB",
+        "os": "Windows",
+        "os_version": "10.0.19043",
+        "ram": {
+            "available": "10.56GB",
+            "free": "10.56GB",
+            "percent": 33.8,
+            "total": "15.94GB",
+            "used": "5.38GB"
+        },
+        "uptime": "6:58:09.340098",
+        "users": {
+            "0": {
+                "host": null,
+                "name": "Pablo",
+                "pid": null,
+                "started": "2022-02-20T17:27:15.482796",
+                "terminal": null
+            }
+        }
+    },
+    "status": {
+        "elapsed": {
+            "dynamic": 1.11,
+            "static": 0.02
+        },
+        "timestamp": "2022-02-21T00:25:13.777095"
+    }
+}
