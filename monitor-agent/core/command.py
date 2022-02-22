@@ -75,15 +75,13 @@ def _executeCommand(command: str, timeout: int) -> typing.Tuple[str, str, int, f
         "VOL",
     ]
     start_time = time.time()
-    proc = command.split()
-    print(proc[0].upper())
     try:
-        if os.name == "nt" and proc[0].upper() in built_in_cmd_commands:
+        if os.name == "nt" and command.split()[0].upper() in built_in_cmd_commands:
             # UTF-8 Codec can't decode bytes
             # https://stackoverflow.com/questions/64948722/error-unicodedecodeerror-utf-8-codec-cant-decode-byte-0xbe-in-position-2-in
             # shell=True MUST NOT BE USED:
             # https://stackoverflow.com/questions/48763362/python-subprocess-kill-with-timeout
-            print("Windows CMD built-in.")
+            # print("Windows CMD built-in.", command)
             process = subprocess.run(
                 command,
                 capture_output=True,
@@ -95,7 +93,7 @@ def _executeCommand(command: str, timeout: int) -> typing.Tuple[str, str, int, f
                 check=True,
             )
         else:
-            print("Linux or Windows command.")
+            # print("Linux or Windows command:", command)
             process = subprocess.run(
                 command.split(),
                 capture_output=True,
@@ -110,7 +108,9 @@ def _executeCommand(command: str, timeout: int) -> typing.Tuple[str, str, int, f
         process = msg
     except (ValueError, FileNotFoundError) as msg:
         end_time = round(time.time() - start_time, 2)
-        return "", msg, timeout, end_time
+        return "", msg.strerror, timeout, end_time
 
     end_time = round(time.time() - start_time, 2)
+    process.stdout = "" if process.stdout is None else process.stdout
+    process.stderr = "" if process.stderr is None else process.stderr
     return process.stdout, process.stderr, timeout, end_time
