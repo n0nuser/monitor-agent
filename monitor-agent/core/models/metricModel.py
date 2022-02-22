@@ -32,9 +32,7 @@ class MetricDynamic:
         self.cpu_freq = psutil.cpu_freq()._asdict()
         self.cpu_percent = psutil.cpu_percent()
         self.ram = _ram_data()
-        self.network_current_in, self.network_current_out = asyncio.run(
-            _cur_network_traffic()
-        )
+        self.network_current_in, self.network_current_out = _cur_network_traffic()
         self.network_total_in, self.network_total_out = _total_network_traffic()
         # self.connections = {}
         # for index, connection in enumerate(psutil.net_connections()):
@@ -92,7 +90,7 @@ def _uptime():
     return str(datetime.timedelta(seconds=(time.time() - psutil.boot_time())))
 
 
-async def _cur_network_traffic(interval=1):
+def _cur_network_traffic(interval=1):
     """_summary_
 
     Args:
@@ -105,7 +103,7 @@ async def _cur_network_traffic(interval=1):
     net1_out = psutil.net_io_counters().bytes_sent
     net1_in = psutil.net_io_counters().bytes_recv
 
-    await asyncio.sleep(interval)
+    time.sleep(interval)
 
     # Get new net in/out
     net2_out = psutil.net_io_counters().bytes_sent
