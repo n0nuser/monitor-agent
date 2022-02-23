@@ -28,7 +28,7 @@ async def command(command: str, timeout: int):
     return Command(command, timeout).__dict__
 
 
-if settings.metrics_endpoint:
+if settings.metrics.endpoint:
 
     @api.get(endpoints["metrics_endpoint"])
     async def metrics_endpoint():
@@ -37,36 +37,35 @@ if settings.metrics_endpoint:
 
 
 @api.on_event("startup")
-@repeat_every(seconds=settings.post_task_interval, logger=logger, wait_first=True)
+@repeat_every(seconds=settings.metrics.post_interval, logger=logger, wait_first=True)
 def periodic():
     # https://github.com/tiangolo/fastapi/issues/520
     # https://fastapi-utils.davidmontague.xyz/user-guide/repeated-tasks/#the-repeat_every-decorator
     # Changed Timeloop for this
     elapsed_time, data = send_metrics_adapter([static, dynamic])
-    send_metrics(url=settings.metrics_URL, elapsed_time=elapsed_time, data=data)
+    send_metrics(url=settings.metrics.url, elapsed_time=elapsed_time, data=data)
 
 
 def start():
     """Launched with `poetry run start` at root level"""
     uvicorn.run(
         "monitor-agent.main:api",
-        host=settings.host,
-        port=settings.port,
-        reload=settings.reload,
-        workers=settings.workers,
-        log_level=settings.log_level,
+        host=settings.uvicorn.host,
+        port=settings.uvicorn.port,
+        reload=settings.uvicorn.reload,
+        workers=settings.uvicorn.workers,
+        log_level=settings.uvicorn.log_level,
         interface="asgi3",
-        # workers=settings.workers,
-        debug=settings.debug,
-        ssl_keyfile=settings.ssl_keyfile,
-        ssl_keyfile_password=settings.ssl_keyfile_password,
-        ssl_certfile=settings.ssl_certfile,
-        ssl_version=settings.ssl_version,
-        ssl_cert_reqs=settings.ssl_cert_reqs,
-        ssl_ca_certs=settings.ssl_ca_certs,
-        ssl_ciphers=settings.ssl_ciphers,
-        limit_concurrency=settings.limit_concurrency,
-        limit_max_requests=settings.limit_max_requests,
-        backlog=settings.backlog,
-        timeout_keep_alive=settings.timeout_keep_alive,
+        debug=settings.uvicorn.debug,
+        ssl_keyfile=settings.uvicorn.ssl_keyfile,
+        ssl_keyfile_password=settings.uvicorn.ssl_keyfile_password,
+        ssl_certfile=settings.uvicorn.ssl_certfile,
+        ssl_version=settings.uvicorn.ssl_version,
+        ssl_cert_reqs=settings.uvicorn.ssl_cert_reqs,
+        ssl_ca_certs=settings.uvicorn.ssl_ca_certs,
+        ssl_ciphers=settings.uvicorn.ssl_ciphers,
+        limit_concurrency=settings.uvicorn.limit_concurrency,
+        limit_max_requests=settings.uvicorn.limit_max_requests,
+        backlog=settings.uvicorn.backlog,
+        timeout_keep_alive=settings.uvicorn.timeout_keep_alive,
     )

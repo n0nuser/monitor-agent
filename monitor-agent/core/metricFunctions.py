@@ -1,4 +1,5 @@
 import time
+import json
 import typing
 import requests
 from ..settings import settings
@@ -45,5 +46,6 @@ def send_metrics(url: str, elapsed_time: dict, data: dict):
     r = requests.post(url, json=json_request)
     # DEBUG
     print(r.status_code)
-    # with open(settings.metrics_file, "w") as f:
-    #     f.write(json.dumps(json_request, indent=4, sort_keys=True))
+    if settings.metrics.enable_file:
+        with open(settings.metrics.file, "w") as f:
+            f.write(json.dumps(json_request, indent=4, sort_keys=True))
