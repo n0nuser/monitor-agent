@@ -2,7 +2,7 @@ import psutil
 import platform
 import time
 import datetime
-import asyncio
+import os
 
 
 class Status:
@@ -34,16 +34,13 @@ class MetricDynamic:
         self.ram = psutil.virtual_memory()._asdict()
         self.network_current_in, self.network_current_out = _cur_network_traffic()
         self.network_total_in, self.network_total_out = _total_network_traffic()
-        # self.connections = {}
-        # for index, connection in enumerate(psutil.net_connections()):
-        #     self.connections[index] = connection
         try:
             self.battery = psutil.sensors_battery()._asdict()
         except AttributeError:
             # If no battery is installed or metrics can’t be determined None is returned.
             self.battery = None
         self.users = _user_list()
-        # self.process = {p.pid: p.info for p in psutil.process_iter(['name', 'username'])}
+        self.processes = _process(self.ram["total"], self.cpu_percent)
         self.disk_percent = _disk_percent()
         self.uptime = _uptime()
 
@@ -93,6 +90,28 @@ def _cur_network_traffic(interval=1):
     current_out = 0 if net1_out > net2_out else net2_out - net1_out
 
     return current_in, current_out
+
+
+def _process(ram: int, pc_cpu_percent):
+    process = {}
+    threshold = 10
+    for p in psutil.process_iter(["name", "username"]):
+        with p.oneshot():
+            cpu_percent = p.cpu_percent()
+            ram_percent = round((p.memory_info().vms / ram) * 100, 2)
+            if (
+                cpu_percent > threshold and not cpu_percent > pc_cpu_percent
+            ) or ram_percent > threshold:
+                process[p.pid] = {
+                    "name": p.name(),
+                    "cpu_percent": cpu_percent,
+                    "ram_percent": ram_percent,
+                    "username": p.username(),
+                    "ppid": p.ppid(),
+                    # Requires elevated permissions
+                    # "path": p.exe()
+                }
+    return process
 
 
 def _total_network_traffic():
