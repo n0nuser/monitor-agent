@@ -1,5 +1,4 @@
 import subprocess
-import psutil
 import typing
 import time
 import os
