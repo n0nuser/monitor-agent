@@ -1,14 +1,20 @@
+import sys
+import json
 import uvicorn
 import logging
 from fastapi import FastAPI, UploadFile, File
-from typing import List
 from fastapi_utils.tasks import repeat_every
-from .settings import Settings, SettingsPydantic
+from .settings import Settings
 from .core.metricFunctions import send_metrics, send_metrics_adapter, static, dynamic
 from .core.command import Command
 
+try:
+    config_file = Settings()
+except json.decoder.JSONDecodeError as msg:
+    print('Error in "settings.json".', msg, file=sys.stderr)
+    exit()
+
 logger = logging.getLogger(__name__)
-config_file = Settings()
 api = FastAPI()
 
 endpoints = {
@@ -28,7 +34,7 @@ async def root():
 async def mod_settings():
     # if token:
     #     blablabla
-    return config_file.read_settings()
+    return config_file.read_settings_file(config_file.abs_file_path)
 
 
 if config_file.settings.metric_endpoint:
@@ -48,13 +54,11 @@ async def command(command: str, timeout: int):
 
 
 @api.post(endpoints["settings"])
-async def mod_settings(settings: List[UploadFile]):
+async def mod_settings(settings: UploadFile):
     # if token:
     #     blablabla
-    print(settings)
-    settings = await settings.json()
-    print(settings)
-    return config_file.write_settings(settings)
+    data: str = settings.file.read().decode()
+    return config_file.write_settings(data)
 
 
 @api.on_event("startup")
@@ -86,6 +90,10 @@ def start():
         log_level=config_file.settings.log_level,
         interface="asgi3",
         debug=config_file.settings.debug,
+        backlog=config_file.settings.backlog,
+        timeout_keep_alive=config_file.settings.timeout_keep_alive,
+        limit_concurrency=config_file.settings.limit_concurrency,
+        limit_max_requests=config_file.settings.limit_max_requests,
         ssl_keyfile=config_file.settings.ssl_keyfile,
         ssl_keyfile_password=config_file.settings.ssl_keyfile_password,
         ssl_certfile=config_file.settings.ssl_certfile,
@@ -93,8 +101,4 @@ def start():
         ssl_cert_reqs=config_file.settings.ssl_cert_reqs,
         ssl_ca_certs=config_file.settings.ssl_ca_certs,
         ssl_ciphers=config_file.settings.ssl_ciphers,
-        limit_concurrency=config_file.settings.limit_concurrency,
-        limit_max_requests=config_file.settings.limit_max_requests,
-        backlog=config_file.settings.backlog,
-        timeout_keep_alive=config_file.settings.timeout_keep_alive,
     )
