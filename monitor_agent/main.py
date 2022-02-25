@@ -37,7 +37,7 @@ async def mod_settings():
     return config_file.read_settings_file(config_file.abs_file_path)
 
 
-if config_file.settings.metric_endpoint:
+if config_file.metric_endpoint:
 
     @api.get(endpoints["metrics_endpoint"])
     async def metrics_endpoint():
@@ -62,19 +62,17 @@ async def mod_settings(settings: UploadFile):
 
 
 @api.on_event("startup")
-@repeat_every(
-    seconds=config_file.settings.post_interval, logger=logger, wait_first=True
-)
+@repeat_every(seconds=config_file.post_interval, logger=logger, wait_first=True)
 def periodic():
     # https://github.com/tiangolo/fastapi/issues/520
     # https://fastapi-utils.davidmontague.xyz/user-guide/repeated-tasks/#the-repeat_every-decorator
     # Changed Timeloop for this
     elapsed_time, data = send_metrics_adapter([static, dynamic])
     send_metrics(
-        url=config_file.settings.post_metric_url,
+        url=config_file.post_metric_url,
         elapsed_time=elapsed_time,
         data=data,
-        file_enabled=config_file.settings.metric_enable_file,
+        file_enabled=config_file.metric_enable_file,
         file_path=config_file.abs_file_path,
     )
 
@@ -83,22 +81,22 @@ def start():
     """Launched with `poetry run start` at root level"""
     uvicorn.run(
         "monitor_agent.main:api",
-        host=config_file.settings.host,
-        port=config_file.settings.port,
-        reload=config_file.settings.reload,
-        workers=config_file.settings.workers,
-        log_level=config_file.settings.log_level,
+        host=config_file.host,
+        port=config_file.port,
+        reload=config_file.reload,
+        workers=config_file.workers,
+        log_level=config_file.log_level,
         interface="asgi3",
-        debug=config_file.settings.debug,
-        backlog=config_file.settings.backlog,
-        timeout_keep_alive=config_file.settings.timeout_keep_alive,
-        limit_concurrency=config_file.settings.limit_concurrency,
-        limit_max_requests=config_file.settings.limit_max_requests,
-        ssl_keyfile=config_file.settings.ssl_keyfile,
-        ssl_keyfile_password=config_file.settings.ssl_keyfile_password,
-        ssl_certfile=config_file.settings.ssl_certfile,
-        ssl_version=config_file.settings.ssl_version,
-        ssl_cert_reqs=config_file.settings.ssl_cert_reqs,
-        ssl_ca_certs=config_file.settings.ssl_ca_certs,
-        ssl_ciphers=config_file.settings.ssl_ciphers,
+        debug=config_file.debug,
+        backlog=config_file.backlog,
+        timeout_keep_alive=config_file.timeout_keep_alive,
+        limit_concurrency=config_file.limit_concurrency,
+        limit_max_requests=config_file.limit_max_requests,
+        ssl_keyfile=config_file.ssl_keyfile,
+        ssl_keyfile_password=config_file.ssl_keyfile_password,
+        ssl_certfile=config_file.ssl_certfile,
+        ssl_version=config_file.ssl_version,
+        ssl_cert_reqs=config_file.ssl_cert_reqs,
+        ssl_ca_certs=config_file.ssl_ca_certs,
+        ssl_ciphers=config_file.ssl_ciphers,
     )
