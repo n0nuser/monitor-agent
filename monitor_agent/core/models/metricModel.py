@@ -106,11 +106,15 @@ def _process(ram: int, pc_cpu_percent):
                     "name": p.name(),
                     "cpu_percent": cpu_percent,
                     "ram_percent": ram_percent,
-                    "username": p.username(),
                     "ppid": p.ppid(),
-                    # Requires elevated permissions
-                    # "path": p.exe()
                 }
+                try:
+                    # Requires elevated permissions SOMETIMES
+                    process[p.pid]["username"] = p.username()
+                    # Requires elevated permissions
+                    process[p.pid]["path"] = p.exe()
+                except (PermissionError, psutil.AccessDenied):
+                    pass
     return process
 
 

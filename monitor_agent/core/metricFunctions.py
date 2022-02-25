@@ -1,7 +1,7 @@
 import time
+import json
 import typing
 import requests
-from ..settings import settings
 from .models.metricModel import Status, MetricDynamic, MetricStatic
 
 # Typing Tuple is used to overcome Python ^3.6 until Python 3.10 problem
@@ -39,11 +39,14 @@ def send_metrics_adapter(function_list: list) -> typing.Tuple[dict, dict]:
     return elapsed_time, data
 
 
-def send_metrics(url: str, elapsed_time: dict, data: dict):
+def send_metrics(
+    url: str, elapsed_time: dict, data: dict, file_enabled: bool, file_path: str
+):
     status = Status(elapsed=elapsed_time).__dict__
     json_request = {"data": data, "status": status}
     r = requests.post(url, json=json_request)
     # DEBUG
     print(r.status_code)
-    # with open(settings.metrics_file, "w") as f:
-    #     f.write(json.dumps(json_request, indent=4, sort_keys=True))
+    if file_enabled:
+        with open(file_path, "w") as f:
+            f.write(json.dumps(json_request, indent=4, sort_keys=True))
