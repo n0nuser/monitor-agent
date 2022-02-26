@@ -16,10 +16,10 @@
     "ssl_ca_certs": null,
     "ssl_cert_reqs": null,
     "ssl_certfile": null,
-    "ssl_ciphers": "TLSv1",
+    "ssl_ciphers": null,
     "ssl_keyfile": null,
     "ssl_keyfile_password": null,
-    "ssl_version": 3,
+    "ssl_version": null,
     "timeout_keep_alive": 5,
     "workers": 4
 }

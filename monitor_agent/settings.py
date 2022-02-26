@@ -1,8 +1,6 @@
-from multiprocessing.sharedctypes import Value
 import os
 import sys
 import json
-from types import SimpleNamespace
 
 main_parameters = [
     "host",
@@ -34,6 +32,42 @@ optional_parameters = [
 ]
 
 config_parameters = main_parameters + optional_parameters
+rel_path = "settings.json"
+dir = os.path.dirname(__file__)  # <-- absolute dir the script is in
+abs_file_path = os.path.join(dir, rel_path)
+
+
+class Settings:
+    def __init__(self):
+        for key, value in self._read_settings_file().items():
+            setattr(self, key, value)
+
+    def _read_settings_file(self):
+        try:
+            f = open(abs_file_path, "r")
+            data = f.read()
+            data_dict = _validate_json(data)
+            data_str, data_dict = _format_json_file(data_dict, abs_file_path)
+        except (json.JSONDecodeError, ValueError, FileNotFoundError) as msg:
+            print(msg, file=sys.stderr)
+            exit()
+
+        return data_dict
+
+    def write_settings(self, data: str):
+        try:
+            data_dict = _validate_json(data)
+            data_str, data_dict = _format_json_file(data_dict, abs_file_path)
+        except (json.JSONDecodeError, ValueError) as msg:
+            return {"status": f"Error: {msg}", "data": data}
+
+        self.settings = data_dict
+        return {"status": "success", "data": data_dict}
+
+
+######################
+## Helper functions ##
+######################
 
 
 def dict_keys_iterator(dictionary: dict):
@@ -43,70 +77,29 @@ def dict_keys_iterator(dictionary: dict):
         yield key
 
 
-class Settings:
-    def __init__(self, rel_path: str = "settings.json"):
-        dir = os.path.dirname(__file__)  # <-- absolute dir the script is in
-        self.abs_file_path = os.path.join(dir, rel_path)
-        self.settings = self.read_settings_file(self.abs_file_path)
+def _validate_json(data: str):
+    data_dict = json.loads(data)
 
-    def _validate_json(self, config_parameters: list, data: dict):
-        keys = [key for key in dict_keys_iterator(data)]
+    keys = [key for key in dict_keys_iterator(data_dict)]
 
-        diff_total = list(set(keys) - set(config_parameters))
-        if len(diff_total) > 0:
-            raise ValueError(f"Config file contains invalid parameters: {diff_total}")
+    diff_total = list(set(keys) - set(config_parameters))
+    if len(diff_total) > 0:
+        raise ValueError(f"Config file contains invalid parameters: {diff_total}")
 
-        diff_main = list(set(main_parameters) - set(keys))
-        if len(diff_main) > 0:
-            raise ValueError(
-                f"Config file does not contain main parameters: {diff_main}"
-            )
+    diff_main = list(set(main_parameters) - set(keys))
+    if len(diff_main) > 0:
+        raise ValueError(f"Config file does not contain main parameters: {diff_main}")
+    return data_dict
 
-        # Need to validate type of data
+    # Need to validate type of data
 
-    def _fill_json(self, optional_parameters: list, json_dict: dict):
-        fill_dict = json_dict.copy()
-        for key in optional_parameters:
-            if key not in fill_dict.keys():
-                fill_dict[key] = None
-        return fill_dict
 
-    def read_settings_file(self, file_path: str):
-        try:
-            f = open(file_path, "r")
-        except FileNotFoundError as msg:
-            print(msg, file=sys.stderr)
-            exit()
-        data = f.read()
-
-        try:
-            json_dict = json.loads(data)
-            self._validate_json(config_parameters, json_dict)
-        except (json.JSONDecodeError, ValueError) as msg:
-            print(msg, file=sys.stderr)
-            exit()
-
-        json_dict = self._fill_json(optional_parameters, json_dict)
-        f = open(self.abs_file_path, "w")
-        f.write(json.dumps(json_dict, indent=4, sort_keys=True))
-
-        return self.read_settings(data)
-
-    def read_settings(self, data: str):
-        """Parse JSON into an object with attributes corresponding to dict keys."""
-        # https://stackoverflow.com/a/15882054
-        return json.loads(data, object_hook=lambda d: SimpleNamespace(**d))
-
-    def write_settings(self, new_data: str):
-        try:
-            json_dict = json.loads(new_data)
-            self._validate_json(config_parameters, json_dict)
-        except (json.JSONDecodeError, ValueError) as msg:
-            return {"status": f"Error: {msg}", "data": new_data}
-
-        json_dict = self._fill_json(optional_parameters, json_dict)
-        f = open(self.abs_file_path, "w")
-        f.write(new_data)
-
-        self.settings = self.read_settings(new_data)
-        return {"status": "success", "data": json_dict}
+def _format_json_file(data: dict, path: str):
+    data_dict = data.copy()
+    for key in optional_parameters:
+        if key not in data_dict.keys():
+            data_dict[key] = None
+    f = open(path, "w")
+    data_str: str = json.dumps(data_dict, indent=4, sort_keys=True)
+    f.write(data_str)
+    return data_str, data_dict
