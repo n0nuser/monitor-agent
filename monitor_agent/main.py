@@ -38,7 +38,7 @@ async def root():
 
 
 @api.get(endpoints["thresholds"])
-async def root():
+async def thresholds():
     return {"thresholds": thresholds}
 
 

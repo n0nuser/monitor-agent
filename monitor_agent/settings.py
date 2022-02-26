@@ -1,9 +1,6 @@
-from asyncore import read
-from multiprocessing.sharedctypes import Value
 import os
 import sys
 import json
-from types import SimpleNamespace
 
 main_parameters = [
     "host",
