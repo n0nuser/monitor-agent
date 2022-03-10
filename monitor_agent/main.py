@@ -1,3 +1,4 @@
+import re
 import sys
 import json
 import uvicorn
@@ -110,7 +111,11 @@ def periodic():
     except KeyError as msg:
         pass
     if alert:
-        r = requests.post(config_file.alert_url, json={"alert": alert})
+        try:
+            r = requests.post(config_file.alert_url, json={"alert": alert})
+        except requests.exceptions.MissingSchema:
+            # If invalid URL is provided
+            pass
 
 
 def start():
