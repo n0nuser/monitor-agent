@@ -104,8 +104,11 @@ def periodic():
         alert["cpu_percent"] = data["cpu_percent"]
     if data["ram"]["percent"] >= thresholds_dict["ram_percent"]:
         alert["ram_percent"] = data["ram"]["percent"]
-    if data["process"]:
-        alert["processes"] = data["process"]
+    try:
+        if data["process"]:
+            alert["processes"] = data["process"]
+    except KeyError as msg:
+        pass
     if alert:
         r = requests.post(config_file.alert_url, json={"alert": alert})
 
