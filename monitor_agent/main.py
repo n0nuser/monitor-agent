@@ -26,7 +26,7 @@ endpoints = {
     "thresholds": "/thresholds",
 }
 
-thresholds = {
+thresholds_dict = {
     "cpu_percent": 50,
     "ram_percent": 30,
 }
@@ -39,7 +39,7 @@ async def root():
 
 @api.get(endpoints["thresholds"])
 async def thresholds():
-    return {"thresholds": thresholds}
+    return {"thresholds": thresholds_dict}
 
 
 @api.get(endpoints["settings"])
@@ -75,14 +75,14 @@ async def mod_settings(settings: UploadFile):
 
 @api.post(endpoints["thresholds"])
 async def mod_settings(
-    cpu_percent: float = thresholds["cpu_percent"],
-    ram_percent: float = thresholds["ram_percent"],
+    cpu_percent: float = thresholds_dict["cpu_percent"],
+    ram_percent: float = thresholds_dict["ram_percent"],
 ):
     # if token:
     #     blablabla
-    thresholds["cpu_percent"] = cpu_percent
-    thresholds["ram_percent"] = ram_percent
-    return {"thresholds": thresholds}
+    thresholds_dict["cpu_percent"] = cpu_percent
+    thresholds_dict["ram_percent"] = ram_percent
+    return {"thresholds": thresholds_dict}
 
 
 @api.on_event("startup")
@@ -100,9 +100,9 @@ def periodic():
         file_path=config_file.metric_file,
     )
     alert = {}
-    if data["cpu_percent"] >= thresholds["cpu_percent"]:
+    if data["cpu_percent"] >= thresholds_dict["cpu_percent"]:
         alert["cpu_percent"] = data["cpu_percent"]
-    if data["ram"]["percent"] >= thresholds["ram_percent"]:
+    if data["ram"]["percent"] >= thresholds_dict["ram_percent"]:
         alert["ram_percent"] = data["ram"]["percent"]
     if data["process"]:
         alert["processes"] = data["process"]
