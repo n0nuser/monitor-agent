@@ -4,17 +4,15 @@ import json
 import uvicorn
 import logging
 import requests
+from urllib3.exceptions import MaxRetryError, NewConnectionError
 from fastapi import FastAPI, UploadFile, File
 from fastapi_utils.tasks import repeat_every
+from monitor_agent.core.helper import save2log
 from .settings import Settings
 from .core.metricFunctions import send_metrics, send_metrics_adapter, static, dynamic
 from .core.command import Command
 
-try:
-    config_file = Settings()
-except json.decoder.JSONDecodeError as msg:
-    print('Error in "settings.json".', msg, file=sys.stderr)
-    exit()
+config_file = Settings()
 
 logger = logging.getLogger(__name__)
 api = FastAPI()
@@ -93,13 +91,17 @@ def periodic():
     # https://fastapi-utils.davidmontague.xyz/user-guide/repeated-tasks/#the-repeat_every-decorator
     # Changed Timeloop for this
     elapsed_time, data = send_metrics_adapter([static, dynamic])
-    send_metrics(
-        url=config_file.post_metric_url,
-        elapsed_time=elapsed_time,
-        data=data,
-        file_enabled=config_file.metric_enable_file,
-        file_path=config_file.metric_file,
-    )
+    try:
+        send_metrics(
+            url=config_file.post_metric_url,
+            elapsed_time=elapsed_time,
+            data=data,
+            file_enabled=config_file.metric_enable_file,
+            file_path=config_file.metric_file,
+        )
+    except (ConnectionRefusedError, requests.exceptions.ConnectionError, NewConnectionError, MaxRetryError) as msg:
+        save2log(type="ERROR", data = f"Could not connect to \"{config_file.post_metric_url}\" ({msg})")
+    
     alert = {}
     if data["cpu_percent"] >= thresholds_dict["cpu_percent"]:
         alert["cpu_percent"] = data["cpu_percent"]
@@ -112,10 +114,10 @@ def periodic():
         pass
     if alert:
         try:
-            r = requests.post(config_file.alert_url, json={"alert": alert})
+            r = requests.post(config_file.post_alert_url, json={"alert": alert})
         except requests.exceptions.MissingSchema:
             # If invalid URL is provided
-            pass
+            save2log(type="ERROR", data = f"Invalid POST URL for Alerts (\"{config_file.post_alert_url}\")")
 
 
 def start():

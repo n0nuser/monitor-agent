@@ -1,5 +1,4 @@
 {
-    "alert_url": "",
     "backlog": 2048,
     "debug": true,
     "host": "0.0.0.0",
@@ -9,7 +8,8 @@
     "metric_enable_file": false,
     "metric_endpoint": true,
     "metric_file": "metrics.json",
-    "port": 8000,
+    "port": 8080,
+    "post_alert_url": "",
     "post_interval": 60,
     "post_metric_url": "http://httpbin.org/post",
     "reload": true,
