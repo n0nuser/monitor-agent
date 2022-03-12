@@ -1,6 +1,8 @@
 import os
 import sys
 import json
+from monitor_agent.core.helper import save2log
+
 
 main_parameters = [
     "host",
@@ -16,7 +18,7 @@ main_parameters = [
     "post_interval",
     "metric_enable_file",
     "metric_file",
-    "alert_url",
+    "post_alert_url",
 ]
 
 optional_parameters = [
@@ -49,7 +51,8 @@ class Settings:
             data_dict = _validate_json(data)
             data_str, data_dict = _format_json_file(data_dict, abs_file_path)
         except (json.JSONDecodeError, ValueError, FileNotFoundError) as msg:
-            print(msg, file=sys.stderr)
+            print(f"ERROR: Invalid JSON settings file - {msg}", file=sys.stderr)
+            save2log(type="ERROR", data = f"Invalid JSON file - {msg}")
             exit()
 
         return data_dict

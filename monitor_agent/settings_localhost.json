@@ -11,7 +11,7 @@
     "port": 8080,
     "post_alert_url": "",
     "post_interval": 60,
-    "post_metric_url": "http://httpbin.org/post",
+    "post_metric_url": "http://localhost/api/metrics",
     "reload": true,
     "ssl_ca_certs": null,
     "ssl_cert_reqs": null,
