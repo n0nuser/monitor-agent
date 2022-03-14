@@ -41,13 +41,6 @@ async def thresholds():
     return {"thresholds": thresholds_dict}
 
 
-@api.get(endpoints["settings"])
-async def mod_settings():
-    # if token:
-    #     blablabla
-    return config_file.read_settings_file(config_file.abs_file_path)
-
-
 if config_file.metric_endpoint:
 
     @api.get(endpoints["metrics"])
@@ -99,9 +92,17 @@ def periodic():
             file_enabled=config_file.metric_enable_file,
             file_path=config_file.metric_file,
         )
-    except (ConnectionRefusedError, requests.exceptions.ConnectionError, NewConnectionError, MaxRetryError) as msg:
-        save2log(type="ERROR", data = f"Could not connect to \"{config_file.post_metric_url}\" ({msg})")
-    
+    except (
+        ConnectionRefusedError,
+        requests.exceptions.ConnectionError,
+        NewConnectionError,
+        MaxRetryError,
+    ) as msg:
+        save2log(
+            type="ERROR",
+            data=f'Could not connect to "{config_file.post_metric_url}" ({msg})',
+        )
+
     alert = {}
     if data["cpu_percent"] >= thresholds_dict["cpu_percent"]:
         alert["cpu_percent"] = data["cpu_percent"]
@@ -117,7 +118,10 @@ def periodic():
             r = requests.post(config_file.post_alert_url, json={"alert": alert})
         except requests.exceptions.MissingSchema:
             # If invalid URL is provided
-            save2log(type="ERROR", data = f"Invalid POST URL for Alerts (\"{config_file.post_alert_url}\")")
+            save2log(
+                type="ERROR",
+                data=f'Invalid POST URL for Alerts ("{config_file.post_alert_url}")',
+            )
 
 
 def start():
