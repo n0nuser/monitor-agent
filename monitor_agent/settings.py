@@ -52,7 +52,7 @@ class Settings:
             data_str, data_dict = _format_json_file(data_dict, abs_file_path)
         except (json.JSONDecodeError, ValueError, FileNotFoundError) as msg:
             print(f"ERROR: Invalid JSON settings file - {msg}", file=sys.stderr)
-            save2log(type="ERROR", data = f"Invalid JSON file - {msg}")
+            save2log(type="ERROR", data=f"Invalid JSON file - {msg}")
             exit()
 
         return data_dict
