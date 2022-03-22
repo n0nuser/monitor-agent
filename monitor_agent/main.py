@@ -3,7 +3,7 @@ import json
 import uvicorn
 import logging
 import requests
-from fastapi import FastAPI, UploadFile, File
+from fastapi import FastAPI, UploadFile
 from fastapi_utils.tasks import repeat_every
 from .settings import Settings
 from .core.metricFunctions import send_metrics, send_metrics_adapter, static, dynamic
@@ -40,13 +40,6 @@ async def root():
 @api.get(endpoints["thresholds"])
 async def thresholds():
     return {"thresholds": thresholds}
-
-
-@api.get(endpoints["settings"])
-async def mod_settings():
-    # if token:
-    #     blablabla
-    return config.read_settings_file(config.abs_file_path)
 
 
 if config.metrics.get_endpoint:
