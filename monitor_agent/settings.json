@@ -1,25 +1,31 @@
 {
-    "alert_url": "",
-    "backlog": 2048,
-    "debug": true,
-    "host": "0.0.0.0",
-    "limit_concurrency": null,
-    "limit_max_requests": null,
-    "log_level": "trace",
-    "metric_enable_file": false,
-    "metric_endpoint": true,
-    "metric_file": "metrics.json",
-    "port": 8000,
-    "post_interval": 60,
-    "post_metric_url": "http://httpbin.org/post",
-    "reload": true,
-    "ssl_ca_certs": null,
-    "ssl_cert_reqs": null,
-    "ssl_certfile": null,
-    "ssl_ciphers": null,
-    "ssl_keyfile": null,
-    "ssl_keyfile_password": null,
-    "ssl_version": null,
-    "timeout_keep_alive": 5,
-    "workers": 4
+    "uvicorn": {
+        "host":"0.0.0.0",
+        "port":8000,
+        "workers":4,
+        "reload":true,
+        "debug":true,
+        "log_level":"trace",
+        "ssl_keyfile":null,
+        "ssl_keyfile_password":null,
+        "ssl_certfile":"None",
+        "ssl_version":3,
+        "ssl_cert_reqs":null,
+        "ssl_ca_certs":null,
+        "ssl_ciphers":"TLSv1",
+        "limit_concurrency":null,
+        "limit_max_requests":null,
+        "backlog":2048,
+        "timeout_keep_alive":5
+    },
+    "metrics": {
+        "get_endpoint":true,
+        "post_url":"http://httpbin.org/post",
+        "post_interval":60,
+        "enable_logfile":false,
+        "log_filename":"metrics.json"
+    },
+    "alerts":{
+        "url":"127.0.0.1:8000/alerts"
+    }
 }

@@ -10,7 +10,7 @@ from .core.metricFunctions import send_metrics, send_metrics_adapter, static, dy
 from .core.command import Command
 
 try:
-    config_file = Settings()
+    config = Settings()
 except json.decoder.JSONDecodeError as msg:
     print('Error in "settings.json".', msg, file=sys.stderr)
     exit()
@@ -46,10 +46,10 @@ async def thresholds():
 async def mod_settings():
     # if token:
     #     blablabla
-    return config_file.read_settings_file(config_file.abs_file_path)
+    return config.read_settings_file(config.abs_file_path)
 
 
-if config_file.metric_endpoint:
+if config.metrics.get_endpoint:
 
     @api.get(endpoints["metrics"])
     async def metrics_endpoint():
@@ -70,7 +70,7 @@ async def mod_settings(settings: UploadFile):
     # if token:
     #     blablabla
     data: str = settings.file.read().decode()
-    return config_file.write_settings(data)
+    return config.write_settings(data)
 
 
 @api.post(endpoints["thresholds"])
@@ -86,18 +86,18 @@ async def mod_settings(
 
 
 @api.on_event("startup")
-@repeat_every(seconds=config_file.post_interval, logger=logger, wait_first=True)
+@repeat_every(seconds=config.metrics.post_interval, logger=logger, wait_first=True)
 def periodic():
     # https://github.com/tiangolo/fastapi/issues/520
     # https://fastapi-utils.davidmontague.xyz/user-guide/repeated-tasks/#the-repeat_every-decorator
     # Changed Timeloop for this
     elapsed_time, data = send_metrics_adapter([static, dynamic])
     send_metrics(
-        url=config_file.post_metric_url,
+        url=config.metrics.post_url,
         elapsed_time=elapsed_time,
         data=data,
-        file_enabled=config_file.metric_enable_file,
-        file_path=config_file.metric_file,
+        file_enabled=config.metrics.enable_logfile,
+        file_path=config.metrics.log_filename,
     )
     alert = {}
     if data["cpu_percent"] >= thresholds["cpu_percent"]:
@@ -107,29 +107,29 @@ def periodic():
     if data["process"]:
         alert["processes"] = data["process"]
     if alert:
-        r = requests.post(config_file.alert_url, json={"alert": alert})
+        r = requests.post(config.alerts.url, json={"alert": alert})
 
 
 def start():
     """Launched with `poetry run start` at root level"""
     uvicorn.run(
         "monitor_agent.main:api",
-        host=config_file.host,
-        port=config_file.port,
-        reload=config_file.reload,
-        workers=config_file.workers,
-        log_level=config_file.log_level,
+        host=config.uvicorn.host,
+        port=config.uvicorn.port,
+        reload=config.uvicorn.reload,
+        workers=config.uvicorn.workers,
+        log_level=config.uvicorn.log_level,
         interface="asgi3",
-        debug=config_file.debug,
-        backlog=config_file.backlog,
-        timeout_keep_alive=config_file.timeout_keep_alive,
-        limit_concurrency=config_file.limit_concurrency,
-        limit_max_requests=config_file.limit_max_requests,
-        ssl_keyfile=config_file.ssl_keyfile,
-        ssl_keyfile_password=config_file.ssl_keyfile_password,
-        ssl_certfile=config_file.ssl_certfile,
-        ssl_version=config_file.ssl_version,
-        ssl_cert_reqs=config_file.ssl_cert_reqs,
-        ssl_ca_certs=config_file.ssl_ca_certs,
-        ssl_ciphers=config_file.ssl_ciphers,
+        debug=config.uvicorn.debug,
+        backlog=config.uvicorn.backlog,
+        timeout_keep_alive=config.uvicorn.timeout_keep_alive,
+        limit_concurrency=config.uvicorn.limit_concurrency,
+        limit_max_requests=config.uvicorn.limit_max_requests,
+        ssl_keyfile=config.uvicorn.ssl_keyfile,
+        ssl_keyfile_password=config.uvicorn.ssl_keyfile_password,
+        ssl_certfile=config.uvicorn.ssl_certfile,
+        ssl_version=config.uvicorn.ssl_version,
+        ssl_cert_reqs=config.uvicorn.ssl_cert_reqs,
+        ssl_ca_certs=config.uvicorn.ssl_ca_certs,
+        ssl_ciphers=config.uvicorn.ssl_ciphers,
     )
