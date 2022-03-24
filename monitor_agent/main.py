@@ -11,6 +11,7 @@ from .core.command import Command
 
 try:
     config = Settings()
+    print(dir(config))
 except json.decoder.JSONDecodeError as msg:
     print('Error in "settings.json".', msg, file=sys.stderr)
     exit()
@@ -26,11 +27,6 @@ endpoints = {
     "thresholds": "/thresholds",
 }
 
-thresholds = {
-    "cpu_percent": 50,
-    "ram_percent": 30,
-}
-
 # GET
 @api.get(endpoints["root"])
 async def root():
@@ -39,11 +35,10 @@ async def root():
 
 @api.get(endpoints["thresholds"])
 async def thresholds():
-    return {"thresholds": thresholds}
+    return {"thresholds": config.thresholds.__dict__}
 
 
 if config.metrics.get_endpoint:
-
     @api.get(endpoints["metrics"])
     async def metrics_endpoint():
         elapsed_time, data = send_metrics_adapter([static, dynamic])
@@ -53,26 +48,17 @@ if config.metrics.get_endpoint:
 # POST
 @api.post(endpoints["command"])
 async def command(command: str, timeout: int):
-    # if token:
-    #     blablabla
     return Command(command, timeout).__dict__
 
 
 @api.post(endpoints["settings"])
 async def mod_settings(settings: UploadFile):
-    # if token:
-    #     blablabla
     data: str = settings.file.read().decode()
     return config.write_settings(data)
 
 
 @api.post(endpoints["thresholds"])
-async def mod_settings(
-    cpu_percent: float = thresholds["cpu_percent"],
-    ram_percent: float = thresholds["ram_percent"],
-):
-    # if token:
-    #     blablabla
+async def mod_settings(cpu_percent: float, ram_percent: float):
     thresholds["cpu_percent"] = cpu_percent
     thresholds["ram_percent"] = ram_percent
     return {"thresholds": thresholds}

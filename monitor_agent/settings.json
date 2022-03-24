@@ -1,31 +1,35 @@
 {
-    "uvicorn": {
-        "host":"0.0.0.0",
-        "port":8000,
-        "workers":4,
-        "reload":true,
-        "debug":true,
-        "log_level":"trace",
-        "ssl_keyfile":null,
-        "ssl_keyfile_password":null,
-        "ssl_certfile":"None",
-        "ssl_version":3,
-        "ssl_cert_reqs":null,
-        "ssl_ca_certs":null,
-        "ssl_ciphers":"TLSv1",
-        "limit_concurrency":null,
-        "limit_max_requests":null,
-        "backlog":2048,
-        "timeout_keep_alive":5
+    "alerts": {
+        "url": "127.0.0.1:8000/alerts"
     },
     "metrics": {
-        "get_endpoint":true,
-        "post_url":"http://httpbin.org/post",
-        "post_interval":60,
-        "enable_logfile":false,
-        "log_filename":"metrics.json"
+        "enable_logfile": false,
+        "get_endpoint": true,
+        "log_filename": "metrics.json",
+        "post_interval": 60,
+        "post_url": "http://httpbin.org/post"
     },
-    "alerts":{
-        "url":"127.0.0.1:8000/alerts"
+    "thresholds": {
+        "cpu_percent": 50,
+        "ram_percent": 30
+    },
+    "uvicorn": {
+        "backlog": 2048,
+        "debug": true,
+        "host": "0.0.0.0",
+        "limit_concurrency": null,
+        "limit_max_requests": null,
+        "log_level": "trace",
+        "port": 8000,
+        "reload": true,
+        "ssl_ca_certs": null,
+        "ssl_cert_reqs": null,
+        "ssl_certfile": "None",
+        "ssl_ciphers": "TLSv1",
+        "ssl_keyfile": null,
+        "ssl_keyfile_password": null,
+        "ssl_version": 3,
+        "timeout_keep_alive": 5,
+        "workers": 4
     }
 }
