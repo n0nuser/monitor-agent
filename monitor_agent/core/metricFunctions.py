@@ -2,12 +2,10 @@ import time
 import json
 import typing
 import requests
+import logging
 
-from monitor_agent.core.helper import save2log
-from .models.metricModel import Status, MetricDynamic, MetricStatic
-
-# Typing Tuple is used to overcome Python ^3.6 until Python 3.10 problem
-# with Tuples not being a standard type
+from monitor_agent.main import LOGGER
+from core.models import Status, MetricDynamic, MetricStatic
 
 
 def execution_time_decorator(function) -> typing.Tuple[float, dict]:
@@ -36,7 +34,7 @@ def send_metrics_adapter(function_list: list) -> typing.Tuple[dict, dict]:
             elapsed_time.update(f_time)
             data.update(f_data)
         except TypeError as msg:
-            save2log(type="WARNING", data=f"TypeError: {msg}")
+            LOGGER.warning(f"TypeError: {msg}", exc_info=True)
             continue
     return elapsed_time, data
 
@@ -48,7 +46,7 @@ def send_metrics(
     json_request = {"data": data, "status": status}
     r = requests.post(url, json=json_request)
     # DEBUG
-    print(r.status_code)
+    logging.debug(f"Status Code: {r.status_code}")
     if file_enabled:
         with open(file_path, "w") as f:
             f.write(json.dumps(json_request, indent=4, sort_keys=True))

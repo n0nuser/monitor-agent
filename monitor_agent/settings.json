@@ -2,6 +2,14 @@
     "alerts": {
         "url": "127.0.0.1:8000/alerts"
     },
+    "auth": {
+        "agent_token": "",
+        "api_token": ""
+    },
+    "logging": {
+        "filename": "monitor.log",
+        "level": "info"
+    },
     "metrics": {
         "enable_logfile": false,
         "get_endpoint": true,

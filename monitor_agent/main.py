@@ -1,6 +1,5 @@
-import re
-import sys
 import json
+from monitor_agent.core.helper import getLogger
 import uvicorn
 import logging
 import requests
@@ -8,15 +7,18 @@ from .settings import Settings
 from .core.command import Command
 from fastapi import FastAPI, UploadFile
 from fastapi_utils.tasks import repeat_every
-from .core.metricFunctions import send_metrics, send_metrics_adapter, static, dynamic
+
 
 try:
     CONFIG = Settings()
 except json.decoder.JSONDecodeError as msg:
-    print('Error in "settings.json".', msg, file=sys.stderr)
+    logging.critical(f'Error in "settings.json". {msg}')
     exit()
 
-logger = logging.getLogger(__name__)
+LOGGER = getLogger(CONFIG)
+
+from .core.metricFunctions import send_metrics, send_metrics_adapter, static, dynamic
+
 api = FastAPI()
 
 endpoints = {
@@ -63,7 +65,7 @@ async def mod_settings(settings: UploadFile):
 
 
 @api.on_event("startup")
-@repeat_every(seconds=CONFIG.metrics.post_interval, logger=logger, wait_first=True)
+@repeat_every(seconds=CONFIG.metrics.post_interval, logger=LOGGER, wait_first=True)
 def periodic():
     # https://github.com/tiangolo/fastapi/issues/520
     # https://fastapi-utils.davidmontague.xyz/user-guide/repeated-tasks/#the-repeat_every-decorator
@@ -78,9 +80,9 @@ def periodic():
     )
 
     alert = {}
-    if data["cpu_percent"] >= thresholds_dict["cpu_percent"]:
+    if data["cpu_percent"] >= CONFIG.thresholds.cpu_percent:
         alert["cpu_percent"] = data["cpu_percent"]
-    if data["ram"]["percent"] >= thresholds_dict["ram_percent"]:
+    if data["ram"]["percent"] >= CONFIG.thresholds.ram_percent:
         alert["ram_percent"] = data["ram"]["percent"]
     try:
         if data["process"]:
@@ -99,4 +101,7 @@ def start():
     uviconfig.pop("__dict__", None)
     uviconfig.pop("__weakref__", None)
     uviconfig.pop("__doc__", None)
-    uvicorn.run(**uviconfig)
+    try:
+        uvicorn.run(**uviconfig)
+    except:
+        LOGGER.critical("Unable to run server.", exc_info=True)

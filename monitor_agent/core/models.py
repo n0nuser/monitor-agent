@@ -2,9 +2,8 @@ import psutil
 import platform
 import time
 import datetime
-import os
 
-from monitor_agent.core.helper import save2log
+from monitor_agent.main import LOGGER
 
 
 class Status:
@@ -116,9 +115,8 @@ def _process(ram: int, pc_cpu_percent):
                     # Requires elevated permissions
                     process[p.pid]["path"] = p.exe()
                 except (PermissionError, psutil.AccessDenied):
-                    save2log(
-                        type="WARNING",
-                        data=f"Could not get Username or Path for process {p.name()}",
+                    LOGGER.warning(
+                        f"Could not get Username or Path for process {p.name()}"
                     )
     return process
 
