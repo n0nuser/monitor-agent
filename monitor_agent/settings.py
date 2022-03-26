@@ -6,16 +6,15 @@ rel_path = "settings.json"
 dir = os.path.dirname(__file__)  # <-- absolute dir the script is in
 abs_file_path = os.path.join(dir, rel_path)
 
+
 class Settings:
     def __init__(self):
-        self.as_dict : dict = self._read_settings_file()
-        # DARLE UNA VUELTA
-        # for key, value in toObj(self.as_dict):
-        #     self.alerts = value if key == "alerts" else None
-        #     self.metrics = value if key == "metrics" else None
-        #     self.thresholds = value if key == "thresholds" else None
-        #     self.uvicorn = value if key == "uvicorn" else None
-            
+        self.as_dict: dict = self._read_settings_file()
+        obj = toObj(self.as_dict)
+        self.alerts = obj.alerts
+        self.metrics = obj.metrics
+        self.thresholds = obj.thresholds
+        self.uvicorn = obj.uvicorn
 
     def _read_settings_file(self):
         try:
@@ -44,10 +43,11 @@ class Settings:
 ## Helper functions ##
 ######################
 
+
 def toObj(item):
     """Jakub Dóka: https://stackoverflow.com/a/65969444"""
     if isinstance(item, dict):
-        obj = type('__object', (object,), {})
+        obj = type("__object", (object,), {})
 
         for key, value in item.items():
             setattr(obj, key, toObj(value))
@@ -57,6 +57,7 @@ def toObj(item):
         return map(toObj, item)
     else:
         return item
+
 
 def _write_file(data: dict, path: str):
     f = open(path, "w")

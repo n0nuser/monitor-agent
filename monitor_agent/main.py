@@ -1,17 +1,18 @@
 import sys
+import ssl
 import json
 import uvicorn
 import logging
 import requests
+from .settings import Settings
+from .core.command import Command
 from fastapi import FastAPI, UploadFile
 from fastapi_utils.tasks import repeat_every
-from .settings import Settings
+from typing import Awaitable, Callable, Dict, List, Optional, Tuple, Type, Union
 from .core.metricFunctions import send_metrics, send_metrics_adapter, static, dynamic
-from .core.command import Command
 
 try:
-    config = Settings()
-    print(dir(config))
+    CONFIG = Settings()
 except json.decoder.JSONDecodeError as msg:
     print('Error in "settings.json".', msg, file=sys.stderr)
     exit()
@@ -35,10 +36,11 @@ async def root():
 
 @api.get(endpoints["thresholds"])
 async def thresholds():
-    return {"thresholds": config.thresholds.__dict__}
+    return {"thresholds": CONFIG.thresholds.__dict__}
 
 
-if config.metrics.get_endpoint:
+if CONFIG.metrics.get_endpoint:
+
     @api.get(endpoints["metrics"])
     async def metrics_endpoint():
         elapsed_time, data = send_metrics_adapter([static, dynamic])
@@ -53,30 +55,26 @@ async def command(command: str, timeout: int):
 
 @api.post(endpoints["settings"])
 async def mod_settings(settings: UploadFile):
+    global CONFIG
     data: str = settings.file.read().decode()
-    return config.write_settings(data)
-
-
-@api.post(endpoints["thresholds"])
-async def mod_settings(cpu_percent: float, ram_percent: float):
-    thresholds["cpu_percent"] = cpu_percent
-    thresholds["ram_percent"] = ram_percent
-    return {"thresholds": thresholds}
+    msg = CONFIG.write_settings(data)
+    CONFIG = Settings()
+    return msg
 
 
 @api.on_event("startup")
-@repeat_every(seconds=config.metrics.post_interval, logger=logger, wait_first=True)
+@repeat_every(seconds=CONFIG.metrics.post_interval, logger=logger, wait_first=True)
 def periodic():
     # https://github.com/tiangolo/fastapi/issues/520
     # https://fastapi-utils.davidmontague.xyz/user-guide/repeated-tasks/#the-repeat_every-decorator
     # Changed Timeloop for this
     elapsed_time, data = send_metrics_adapter([static, dynamic])
     send_metrics(
-        url=config.metrics.post_url,
+        url=CONFIG.metrics.post_url,
         elapsed_time=elapsed_time,
         data=data,
-        file_enabled=config.metrics.enable_logfile,
-        file_path=config.metrics.log_filename,
+        file_enabled=CONFIG.metrics.enable_logfile,
+        file_path=CONFIG.metrics.log_filename,
     )
     alert = {}
     if data["cpu_percent"] >= thresholds["cpu_percent"]:
@@ -86,29 +84,15 @@ def periodic():
     if data["process"]:
         alert["processes"] = data["process"]
     if alert:
-        r = requests.post(config.alerts.url, json={"alert": alert})
+        r = requests.post(CONFIG.alerts.url, json={"alert": alert})
 
 
 def start():
     """Launched with `poetry run start` at root level"""
-    uvicorn.run(
-        "monitor_agent.main:api",
-        host=config.uvicorn.host,
-        port=config.uvicorn.port,
-        reload=config.uvicorn.reload,
-        workers=config.uvicorn.workers,
-        log_level=config.uvicorn.log_level,
-        interface="asgi3",
-        debug=config.uvicorn.debug,
-        backlog=config.uvicorn.backlog,
-        timeout_keep_alive=config.uvicorn.timeout_keep_alive,
-        limit_concurrency=config.uvicorn.limit_concurrency,
-        limit_max_requests=config.uvicorn.limit_max_requests,
-        ssl_keyfile=config.uvicorn.ssl_keyfile,
-        ssl_keyfile_password=config.uvicorn.ssl_keyfile_password,
-        ssl_certfile=config.uvicorn.ssl_certfile,
-        ssl_version=config.uvicorn.ssl_version,
-        ssl_cert_reqs=config.uvicorn.ssl_cert_reqs,
-        ssl_ca_certs=config.uvicorn.ssl_ca_certs,
-        ssl_ciphers=config.uvicorn.ssl_ciphers,
-    )
+    uviconfig = {"app": "monitor_agent.main:api", "interface": "asgi3"}
+    uviconfig.update(CONFIG.uvicorn.__dict__)
+    uviconfig.pop("__module__", None)
+    uviconfig.pop("__dict__", None)
+    uviconfig.pop("__weakref__", None)
+    uviconfig.pop("__doc__", None)
+    uvicorn.run(**uviconfig)
