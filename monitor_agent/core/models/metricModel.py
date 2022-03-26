@@ -4,6 +4,8 @@ import time
 import datetime
 import os
 
+from monitor_agent.core.helper import save2log
+
 
 class Status:
     # def __init__(self, error_code, error_message, elapsed):
@@ -114,7 +116,10 @@ def _process(ram: int, pc_cpu_percent):
                     # Requires elevated permissions
                     process[p.pid]["path"] = p.exe()
                 except (PermissionError, psutil.AccessDenied):
-                    pass
+                    save2log(
+                        type="WARNING",
+                        data=f"Could not get Username or Path for process {p.name()}",
+                    )
     return process
 
 

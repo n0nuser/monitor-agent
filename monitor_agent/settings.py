@@ -1,6 +1,8 @@
 import os
 import sys
 import json
+from monitor_agent.core.helper import save2log
+
 
 rel_path = "settings.json"
 dir = os.path.dirname(__file__)  # <-- absolute dir the script is in
@@ -23,7 +25,8 @@ class Settings:
             data_dict = json.loads(data)
             data_str, data_dict = _write_file(data_dict, abs_file_path)
         except (json.JSONDecodeError, ValueError, FileNotFoundError) as msg:
-            print(msg, file=sys.stderr)
+            print(f"ERROR: Invalid JSON settings file - {msg}", file=sys.stderr)
+            save2log(type="ERROR", data=f"Invalid JSON file - {msg}")
             exit()
 
         return data_dict

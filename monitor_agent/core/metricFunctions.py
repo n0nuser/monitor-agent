@@ -2,6 +2,8 @@ import time
 import json
 import typing
 import requests
+
+from monitor_agent.core.helper import save2log
 from .models.metricModel import Status, MetricDynamic, MetricStatic
 
 # Typing Tuple is used to overcome Python ^3.6 until Python 3.10 problem
@@ -34,7 +36,7 @@ def send_metrics_adapter(function_list: list) -> typing.Tuple[dict, dict]:
             elapsed_time.update(f_time)
             data.update(f_data)
         except TypeError as msg:
-            print(msg)
+            save2log(type="WARNING", data=f"TypeError: {msg}")
             continue
     return elapsed_time, data
 

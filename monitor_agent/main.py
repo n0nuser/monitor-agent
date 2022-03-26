@@ -1,5 +1,5 @@
+import re
 import sys
-import ssl
 import json
 import uvicorn
 import logging
@@ -8,7 +8,6 @@ from .settings import Settings
 from .core.command import Command
 from fastapi import FastAPI, UploadFile
 from fastapi_utils.tasks import repeat_every
-from typing import Awaitable, Callable, Dict, List, Optional, Tuple, Type, Union
 from .core.metricFunctions import send_metrics, send_metrics_adapter, static, dynamic
 
 try:
@@ -27,6 +26,7 @@ endpoints = {
     "settings": "/settings",
     "thresholds": "/thresholds",
 }
+
 
 # GET
 @api.get(endpoints["root"])
@@ -76,13 +76,17 @@ def periodic():
         file_enabled=CONFIG.metrics.enable_logfile,
         file_path=CONFIG.metrics.log_filename,
     )
+
     alert = {}
-    if data["cpu_percent"] >= thresholds["cpu_percent"]:
+    if data["cpu_percent"] >= thresholds_dict["cpu_percent"]:
         alert["cpu_percent"] = data["cpu_percent"]
-    if data["ram"]["percent"] >= thresholds["ram_percent"]:
+    if data["ram"]["percent"] >= thresholds_dict["ram_percent"]:
         alert["ram_percent"] = data["ram"]["percent"]
-    if data["process"]:
-        alert["processes"] = data["process"]
+    try:
+        if data["process"]:
+            alert["processes"] = data["process"]
+    except KeyError as msg:
+        pass
     if alert:
         r = requests.post(CONFIG.alerts.url, json={"alert": alert})
 
