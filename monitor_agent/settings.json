@@ -3,8 +3,9 @@
         "url": "127.0.0.1:8000/alerts"
     },
     "auth": {
-        "agent_token": "",
-        "api_token": ""
+        "id_token": "",
+        "api_token": "",
+        "name": ""
     },
     "logging": {
         "filename": "monitor.log",
