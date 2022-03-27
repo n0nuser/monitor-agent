@@ -3,7 +3,7 @@ import platform
 import time
 import datetime
 
-from monitor_agent.main import LOGGER
+from monitor_agent.main import logging
 
 
 class Status:
@@ -115,7 +115,7 @@ def _process(ram: int, pc_cpu_percent):
                     # Requires elevated permissions
                     process[p.pid]["path"] = p.exe()
                 except (PermissionError, psutil.AccessDenied):
-                    LOGGER.warning(
+                    logging.warning(
                         f"Could not get Username or Path for process {p.name()}"
                     )
     return process

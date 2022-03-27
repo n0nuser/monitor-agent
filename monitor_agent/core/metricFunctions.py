@@ -4,8 +4,7 @@ import typing
 import requests
 import logging
 
-from monitor_agent.main import LOGGER
-from core.models import Status, MetricDynamic, MetricStatic
+from monitor_agent.core.models import Status, MetricDynamic, MetricStatic
 
 
 def execution_time_decorator(function) -> typing.Tuple[float, dict]:
@@ -34,18 +33,26 @@ def send_metrics_adapter(function_list: list) -> typing.Tuple[dict, dict]:
             elapsed_time.update(f_time)
             data.update(f_data)
         except TypeError as msg:
-            LOGGER.warning(f"TypeError: {msg}", exc_info=True)
+            logging.warning(f"TypeError: {msg}", exc_info=True)
             continue
     return elapsed_time, data
 
 
 def send_metrics(
-    url: str, elapsed_time: dict, data: dict, file_enabled: bool, file_path: str
+    url: str, elapsed_time: dict, data: dict, file_enabled: bool, file_path: str, auth: dict, port:int
 ):
+    auth.update({"port": port})
+    auth.pop("__module__", None)
+    auth.pop("__dict__", None)
+    auth.pop("__weakref__", None)
+    auth.pop("__doc__", None)
     status = Status(elapsed=elapsed_time).__dict__
-    json_request = {"data": data, "status": status}
-    r = requests.post(url, json=json_request)
-    # DEBUG
+    json_request = {"auth": auth, "data": data, "status": status}
+    try:
+        r = requests.post(url, json=json_request, headers={'Authorization': auth["api_token"]})
+    except requests.exceptions.InvalidSchema as e:
+        logging.critical(f"Agent could not send metrics to server {url}", exc_info=True)
+    logging.debug(f"Response: {r.text}")
     logging.debug(f"Status Code: {r.status_code}")
     if file_enabled:
         with open(file_path, "w") as f:

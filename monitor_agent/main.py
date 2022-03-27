@@ -1,5 +1,4 @@
 import json
-from monitor_agent.core.helper import getLogger
 import uvicorn
 import logging
 import requests
@@ -7,6 +6,7 @@ from .settings import Settings
 from .core.command import Command
 from fastapi import FastAPI, UploadFile
 from fastapi_utils.tasks import repeat_every
+from monitor_agent.core.helper import getLogger
 
 
 try:
@@ -15,7 +15,7 @@ except json.decoder.JSONDecodeError as msg:
     logging.critical(f'Error in "settings.json". {msg}')
     exit()
 
-LOGGER = getLogger(CONFIG)
+getLogger(CONFIG.logging.level, CONFIG.logging.filename)
 
 from .core.metricFunctions import send_metrics, send_metrics_adapter, static, dynamic
 
@@ -63,21 +63,26 @@ async def mod_settings(settings: UploadFile):
     CONFIG = Settings()
     return msg
 
+logging.debug(CONFIG.metrics.post_interval)
 
 @api.on_event("startup")
-@repeat_every(seconds=CONFIG.metrics.post_interval, logger=LOGGER, wait_first=True)
+@repeat_every(seconds=CONFIG.metrics.post_interval, logger=logging, wait_first=True)
 def periodic():
     # https://github.com/tiangolo/fastapi/issues/520
     # https://fastapi-utils.davidmontague.xyz/user-guide/repeated-tasks/#the-repeat_every-decorator
     # Changed Timeloop for this
     elapsed_time, data = send_metrics_adapter([static, dynamic])
+    logging.debug("Sending metrics")
     send_metrics(
         url=CONFIG.metrics.post_url,
         elapsed_time=elapsed_time,
         data=data,
         file_enabled=CONFIG.metrics.enable_logfile,
         file_path=CONFIG.metrics.log_filename,
+        auth=dict(CONFIG.auth.__dict__),
+        port=CONFIG.uvicorn.port
     )
+    logging.debug("Metrics sent!")
 
     alert = {}
     if data["cpu_percent"] >= CONFIG.thresholds.cpu_percent:
@@ -90,7 +95,11 @@ def periodic():
     except KeyError as msg:
         pass
     if alert:
-        r = requests.post(CONFIG.alerts.url, json={"alert": alert})
+        try:
+            r = requests.post(CONFIG.alerts.url, json={"alert": alert})
+        except requests.exceptions.InvalidSchema as e:
+            logging.error(f"Agent could not send an alert to {CONFIG.alerts.url}", exc_info=True)
+
 
 
 def start():
@@ -104,4 +113,4 @@ def start():
     try:
         uvicorn.run(**uviconfig)
     except:
-        LOGGER.critical("Unable to run server.", exc_info=True)
+        logging.critical("Unable to run server.", exc_info=True)

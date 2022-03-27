@@ -1,22 +1,22 @@
 {
     "alerts": {
-        "url": "127.0.0.1:8000/alerts"
+        "url": "http://127.0.0.1:8000/api/alerts/"
     },
     "auth": {
-        "id_token": "",
-        "api_token": "",
-        "name": ""
+        "api_token": "7320730b62807c221d0058eff8d13fa26b714db6",
+        "id_token": "79cff2298c9a54d0ccef292fe8938e4055faa708",
+        "name": "NUC Server"
     },
     "logging": {
         "filename": "monitor.log",
-        "level": "info"
+        "level": "debug"
     },
     "metrics": {
         "enable_logfile": false,
         "get_endpoint": true,
         "log_filename": "metrics.json",
         "post_interval": 60,
-        "post_url": "http://httpbin.org/post"
+        "post_url": "http://127.0.0.1:8000/api/metrics/"
     },
     "thresholds": {
         "cpu_percent": 50,
@@ -27,7 +27,7 @@
         "debug": true,
         "host": "0.0.0.0",
         "log_level": "trace",
-        "port": 8000,
+        "port": 8080,
         "reload": true,
         "timeout_keep_alive": 5,
         "workers": 4
