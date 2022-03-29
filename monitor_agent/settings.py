@@ -16,6 +16,7 @@ class Settings:
         self.auth = _obj.auth
         self.logging = _obj.logging
         self.metrics = _obj.metrics
+        self.endpoints = _obj.endpoints
         self.thresholds = _obj.thresholds
         self.uvicorn = _obj.uvicorn
 

@@ -3,9 +3,13 @@
         "url": "http://127.0.0.1:8000/api/alerts/"
     },
     "auth": {
-        "api_token": "7320730b62807c221d0058eff8d13fa26b714db6",
-        "id_token": "79cff2298c9a54d0ccef292fe8938e4055faa708",
-        "name": "NUC Server"
+        "agent_token": "31dc98714ebef0f1feadae06efaee156ab9210fa",
+        "name": "localhost",
+        "user_token": "690b8d290d08fa26eecf3d69b6d2b76fee28b430"
+    },
+    "endpoints": {
+        "agent_endpoint": "http://localhost:8000/api/agents/",
+        "metric_endpoint": "http://127.0.0.1:8000/api/metrics/"
     },
     "logging": {
         "filename": "monitor.log",
@@ -15,8 +19,7 @@
         "enable_logfile": false,
         "get_endpoint": true,
         "log_filename": "metrics.json",
-        "post_interval": 60,
-        "post_url": "http://127.0.0.1:8000/api/metrics/"
+        "post_interval": 10
     },
     "thresholds": {
         "cpu_percent": 50,
