@@ -3,9 +3,9 @@
         "url": "http://127.0.0.1:8000/api/alerts/"
     },
     "auth": {
-        "agent_token": "31dc98714ebef0f1feadae06efaee156ab9210fa",
+        "agent_token": "1b08ef6ec3af737bcc443050a3556638251abfe6",
         "name": "localhost",
-        "user_token": "690b8d290d08fa26eecf3d69b6d2b76fee28b430"
+        "user_token": "609d79c47e1beb3ec0425ec2e3ad5bbea79994f4"
     },
     "endpoints": {
         "agent_endpoint": "http://localhost:8000/api/agents/",
@@ -19,7 +19,7 @@
         "enable_logfile": false,
         "get_endpoint": true,
         "log_filename": "metrics.json",
-        "post_interval": 10
+        "post_interval": 60
     },
     "thresholds": {
         "cpu_percent": 50,

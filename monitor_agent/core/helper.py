@@ -3,7 +3,7 @@ import logging
 
 def getLogger(level: str, filename: str):
     log_level = ""
-    tranlation = {
+    translation = {
         "debug": logging.DEBUG,
         "info": logging.INFO,
         "warning": logging.WARNING,
@@ -11,8 +11,8 @@ def getLogger(level: str, filename: str):
         "critical": logging.CRITICAL,
     }
     try:
-        if level in tranlation.keys():
-            log_level = tranlation[level]
+        if level in translation.keys():
+            log_level = translation[level]
         else:
             logging.warning("Level not established in Settings.json")
             log_level = logging.info
