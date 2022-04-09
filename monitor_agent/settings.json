@@ -1,23 +1,23 @@
 {
     "alerts": {
-        "url": "http://127.0.0.1:8000/api/alerts/"
+        "url": "http://localhost:8000/api/alerts/"
     },
     "auth": {
-        "agent_token": "1b08ef6ec3af737bcc443050a3556638251abfe6",
-        "name": "localhost",
-        "user_token": "609d79c47e1beb3ec0425ec2e3ad5bbea79994f4"
+        "agent_token": "f214030c663a2d4b1dc7e133d51635184b006da6",
+        "name": "Win10",
+        "user_token": "dca6ce1b19832db09b636844c85dbb3295f1a469"
     },
     "endpoints": {
         "agent_endpoint": "http://localhost:8000/api/agents/",
-        "metric_endpoint": "http://127.0.0.1:8000/api/metrics/"
+        "metric_endpoint": "http://localhost:8000/api/metrics/"
     },
     "logging": {
         "filename": "monitor.log",
-        "level": "debug"
+        "level": "info"
     },
     "metrics": {
         "enable_logfile": false,
-        "get_endpoint": true,
+        "get_endpoint": false,
         "log_filename": "metrics.json",
         "post_interval": 60
     },
@@ -27,7 +27,7 @@
     },
     "uvicorn": {
         "backlog": 2048,
-        "debug": true,
+        "debug": false,
         "host": "0.0.0.0",
         "log_level": "trace",
         "port": 8080,
