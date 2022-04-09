@@ -1,13 +1,12 @@
-import time
 import json
+import time
 import typing
 import requests
+import logging
+from requests.exceptions import ConnectionError, InvalidSchema
+from urllib3.exceptions import MaxRetryError, NewConnectionError
 
-from monitor_agent.core.helper import save2log
-from .models.metricModel import Status, MetricDynamic, MetricStatic
-
-# Typing Tuple is used to overcome Python ^3.6 until Python 3.10 problem
-# with Tuples not being a standard type
+from monitor_agent.core.models import Status, MetricDynamic, MetricStatic
 
 
 def execution_time_decorator(function) -> typing.Tuple[float, dict]:
@@ -36,19 +35,56 @@ def send_metrics_adapter(function_list: list) -> typing.Tuple[dict, dict]:
             elapsed_time.update(f_time)
             data.update(f_data)
         except TypeError as msg:
-            save2log(type="WARNING", data=f"TypeError: {msg}")
+            logging.warning(f"TypeError: {msg}", exc_info=True)
             continue
     return elapsed_time, data
 
 
 def send_metrics(
-    url: str, elapsed_time: dict, data: dict, file_enabled: bool, file_path: str
+    elapsed_time: dict,
+    metrics: dict,
+    file_enabled: bool,
+    file_path: str,
+    metric_endpoint: str,
+    agent_endpoint: str,
+    user_token: str,
+    agent_token: str,
+    name: str,
 ):
     status = Status(elapsed=elapsed_time).__dict__
-    json_request = {"data": data, "status": status}
-    r = requests.post(url, json=json_request)
-    # DEBUG
-    print(r.status_code)
+    if not agent_endpoint.endswith("/"):
+        agent_endpoint = agent_endpoint + "/"
+    if not metric_endpoint.endswith("/"):
+        metric_endpoint = metric_endpoint + "/"
+
+    agent_token = f"{agent_endpoint}{agent_token}/"
+    json_request = {
+        "agent": agent_token,
+        "name": name,
+        "metrics": metrics,
+        "status": status,
+    }
+    logging.debug(f"Agent token: {agent_token}")
+    logging.debug(f"Metric endpoint: {metric_endpoint}")
+
+    try:
+        r = requests.post(
+            metric_endpoint,
+            json=json_request,
+            headers={"Authorization": f"Token {user_token}"},
+        )
+        logging.debug(f"Response: {r.text}")
+        logging.debug(f"Status Code: {r.status_code}")
+    except (
+        MaxRetryError,
+        NewConnectionError,
+        ConnectionRefusedError,
+        ConnectionError,
+        InvalidSchema,
+    ) as e:
+        logging.critical(
+            f"Agent could not send metrics to server {metric_endpoint}", exc_info=True
+        )
     if file_enabled:
         with open(file_path, "w") as f:
             f.write(json.dumps(json_request, indent=4, sort_keys=True))

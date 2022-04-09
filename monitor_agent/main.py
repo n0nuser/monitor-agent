@@ -1,5 +1,3 @@
-import re
-import sys
 import json
 import uvicorn
 import logging
@@ -8,15 +6,19 @@ from .settings import Settings
 from .core.command import Command
 from fastapi import FastAPI, UploadFile
 from fastapi_utils.tasks import repeat_every
-from .core.metricFunctions import send_metrics, send_metrics_adapter, static, dynamic
+from monitor_agent.core.helper import getLogger
+
 
 try:
     CONFIG = Settings()
 except json.decoder.JSONDecodeError as msg:
-    print('Error in "settings.json".', msg, file=sys.stderr)
+    logging.critical(f'Error in "settings.json". {msg}')
     exit()
 
-logger = logging.getLogger(__name__)
+getLogger(CONFIG.logging.level, CONFIG.logging.filename)
+
+from .core.metricFunctions import send_metrics, send_metrics_adapter, static, dynamic
+
 api = FastAPI()
 
 endpoints = {
@@ -62,33 +64,45 @@ async def mod_settings(settings: UploadFile):
     return msg
 
 
+logging.debug(f"POST Interval: {CONFIG.metrics.post_interval}")
+
+
 @api.on_event("startup")
-@repeat_every(seconds=CONFIG.metrics.post_interval, logger=logger, wait_first=True)
+@repeat_every(seconds=CONFIG.metrics.post_interval, logger=logging, wait_first=True)
 def periodic():
     # https://github.com/tiangolo/fastapi/issues/520
     # https://fastapi-utils.davidmontague.xyz/user-guide/repeated-tasks/#the-repeat_every-decorator
     # Changed Timeloop for this
-    elapsed_time, data = send_metrics_adapter([static, dynamic])
+    elapsed_time, metrics = send_metrics_adapter([static, dynamic])
     send_metrics(
-        url=CONFIG.metrics.post_url,
         elapsed_time=elapsed_time,
-        data=data,
+        metrics=metrics,
         file_enabled=CONFIG.metrics.enable_logfile,
         file_path=CONFIG.metrics.log_filename,
+        metric_endpoint=CONFIG.endpoints.metric_endpoint,
+        agent_endpoint=CONFIG.endpoints.agent_endpoint,
+        agent_token=CONFIG.auth.agent_token,
+        user_token=CONFIG.auth.user_token,
+        name=CONFIG.auth.name,
     )
 
     alert = {}
-    if data["cpu_percent"] >= thresholds_dict["cpu_percent"]:
-        alert["cpu_percent"] = data["cpu_percent"]
-    if data["ram"]["percent"] >= thresholds_dict["ram_percent"]:
-        alert["ram_percent"] = data["ram"]["percent"]
+    if metrics["cpu_percent"] >= CONFIG.thresholds.cpu_percent:
+        alert["cpu_percent"] = metrics["cpu_percent"]
+    if metrics["ram"]["percent"] >= CONFIG.thresholds.ram_percent:
+        alert["ram_percent"] = metrics["ram"]["percent"]
     try:
-        if data["process"]:
-            alert["processes"] = data["process"]
+        if metrics["process"]:
+            alert["processes"] = metrics["process"]
     except KeyError as msg:
         pass
     if alert:
-        r = requests.post(CONFIG.alerts.url, json={"alert": alert})
+        try:
+            r = requests.post(CONFIG.alerts.url, json={"alert": alert})
+        except requests.exceptions.InvalidSchema as e:
+            logging.error(
+                f"Agent could not send an alert to {CONFIG.alerts.url}", exc_info=True
+            )
 
 
 def start():
@@ -99,4 +113,7 @@ def start():
     uviconfig.pop("__dict__", None)
     uviconfig.pop("__weakref__", None)
     uviconfig.pop("__doc__", None)
-    uvicorn.run(**uviconfig)
+    try:
+        uvicorn.run(**uviconfig)
+    except:
+        logging.critical("Unable to run server.", exc_info=True)

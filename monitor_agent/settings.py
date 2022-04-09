@@ -1,7 +1,6 @@
 import os
-import sys
 import json
-from monitor_agent.core.helper import save2log
+import logging
 
 
 rel_path = "settings.json"
@@ -12,11 +11,14 @@ abs_file_path = os.path.join(dir, rel_path)
 class Settings:
     def __init__(self):
         self.as_dict: dict = self._read_settings_file()
-        obj = toObj(self.as_dict)
-        self.alerts = obj.alerts
-        self.metrics = obj.metrics
-        self.thresholds = obj.thresholds
-        self.uvicorn = obj.uvicorn
+        _obj = toObj(self.as_dict)
+        self.alerts = _obj.alerts
+        self.auth = _obj.auth
+        self.logging = _obj.logging
+        self.metrics = _obj.metrics
+        self.endpoints = _obj.endpoints
+        self.thresholds = _obj.thresholds
+        self.uvicorn = _obj.uvicorn
 
     def _read_settings_file(self):
         try:
@@ -25,8 +27,7 @@ class Settings:
             data_dict = json.loads(data)
             data_str, data_dict = _write_file(data_dict, abs_file_path)
         except (json.JSONDecodeError, ValueError, FileNotFoundError) as msg:
-            print(f"ERROR: Invalid JSON settings file - {msg}", file=sys.stderr)
-            save2log(type="ERROR", data=f"Invalid JSON file - {msg}")
+            logging.error(f"Invalid JSON settings file.", exc_info=True)
             exit()
 
         return data_dict

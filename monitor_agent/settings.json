@@ -1,13 +1,25 @@
 {
     "alerts": {
-        "url": "127.0.0.1:8000/alerts"
+        "url": "http://localhost:8000/api/alerts/"
+    },
+    "auth": {
+        "agent_token": "f214030c663a2d4b1dc7e133d51635184b006da6",
+        "name": "Win10",
+        "user_token": "dca6ce1b19832db09b636844c85dbb3295f1a469"
+    },
+    "endpoints": {
+        "agent_endpoint": "http://localhost:8000/api/agents/",
+        "metric_endpoint": "http://localhost:8000/api/metrics/"
+    },
+    "logging": {
+        "filename": "monitor.log",
+        "level": "info"
     },
     "metrics": {
         "enable_logfile": false,
-        "get_endpoint": true,
+        "get_endpoint": false,
         "log_filename": "metrics.json",
-        "post_interval": 60,
-        "post_url": "http://httpbin.org/post"
+        "post_interval": 60
     },
     "thresholds": {
         "cpu_percent": 50,
@@ -15,10 +27,10 @@
     },
     "uvicorn": {
         "backlog": 2048,
-        "debug": true,
+        "debug": false,
         "host": "0.0.0.0",
         "log_level": "trace",
-        "port": 8000,
+        "port": 8080,
         "reload": true,
         "timeout_keep_alive": 5,
         "workers": 4

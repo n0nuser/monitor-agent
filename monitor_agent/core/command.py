@@ -80,7 +80,6 @@ def _executeCommand(command: str, timeout: int) -> typing.Tuple[str, str, int, f
             # https://stackoverflow.com/questions/64948722/error-unicodedecodeerror-utf-8-codec-cant-decode-byte-0xbe-in-position-2-in
             # shell=True MUST NOT BE USED:
             # https://stackoverflow.com/questions/48763362/python-subprocess-kill-with-timeout
-            # print("Windows CMD built-in.", command)
             process = subprocess.run(
                 command,
                 capture_output=True,
@@ -92,7 +91,6 @@ def _executeCommand(command: str, timeout: int) -> typing.Tuple[str, str, int, f
                 check=True,
             )
         else:
-            # print("Linux or Windows command:", command)
             process = subprocess.run(
                 command.split(),
                 capture_output=True,
