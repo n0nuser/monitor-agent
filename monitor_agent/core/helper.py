@@ -1,14 +1,40 @@
-import sys
-from datetime import datetime
-
-LOG_FILE = "monitor-agent.log"
-MODE = "a+"
+import logging
 
 
-def save2log(filename: str = LOG_FILE, mode: str = MODE, data="", type=""):
+def getLogger(level: str, filename: str):
+    log_level = ""
+    translation = {
+        "debug": logging.DEBUG,
+        "info": logging.INFO,
+        "warning": logging.WARNING,
+        "error": logging.ERROR,
+        "critical": logging.CRITICAL,
+    }
     try:
-        with open(filename, mode) as f:
-            timestamp = datetime.now().strftime("%d/%m/%Y:%H:%M:%S")
-            f.write(f"{type} - - [{timestamp}] : {data}\n")
-    except OSError as msg:
-        print(f"ERROR: Couldn't open file {filename} - {msg}", file=sys.stderr)
+        if level in translation.keys():
+            log_level = translation[level]
+        else:
+            logging.warning("Level not established in Settings.json")
+            log_level = logging.info
+    except AttributeError as e:
+        logging.warning(
+            "Level not established in Settings.json.\nDefault Info level will be used.",
+            exc_info=True,
+        )
+        log_level = logging.info
+
+    log_filename = ""
+    try:
+        log_filename = filename
+    except AttributeError as e:
+        logging.warning(
+            'Log filename not established in Settings.json.\nDefault "monitor.log" file will be used.',
+            exc_info=True,
+        )
+        log_filename = "monitor.log"
+
+    logging.basicConfig(
+        level=log_level,
+        filename=log_filename,
+        format="%(asctime)s - %(levelname)s - %(message)s",
+    )
