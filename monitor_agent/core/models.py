@@ -42,7 +42,7 @@ class MetricDynamic:
             self.battery = None
         self.users = _user_list()
         self.processes = _process(self.ram["total"], self.cpu_percent)
-        self.disk_percent = _disk_percent()
+        self.disk_io_bytes = _disk_io_bytes()
         self.uptime = _uptime()
 
 
@@ -143,14 +143,10 @@ def _ip_addresses():
     return addresses
 
 
-def _disk_percent():
-    p = psutil.Process()
-    io_counters = p.io_counters()
-    disk_usage_process = io_counters[2] + io_counters[3]  # read_bytes + write_bytes
+def _disk_io_bytes():
     disk_io_counter = psutil.disk_io_counters()
     disk_total = disk_io_counter[2] + disk_io_counter[3]  # read_bytes + write_bytes
-    disk = round(disk_usage_process / disk_total * 100, 2)
-    return disk
+    return round(disk_total, 2)
 
 
 def _disk_list():
