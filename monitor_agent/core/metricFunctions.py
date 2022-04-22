@@ -6,7 +6,7 @@ import logging
 from requests.exceptions import ConnectionError, InvalidSchema
 from urllib3.exceptions import MaxRetryError, NewConnectionError
 
-from monitor_agent.core.models import Status, MetricDynamic, MetricStatic
+from core.models import Status, MetricDynamic, MetricStatic
 
 
 def execution_time_decorator(function) -> typing.Tuple[float, dict]:
