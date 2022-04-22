@@ -1,23 +1,23 @@
 {
     "alerts": {
-        "url": "http://localhost:8000/api/alerts/"
+        "url": "http://localhost/api/alerts/"
     },
     "auth": {
-        "agent_token": "1b08ef6ec3af737bcc443050a3556638251abfe6",
-        "name": "Laptop",
-        "user_token": "e9a8c4e216a2036d4ee3b820693e670cab0073fd"
+        "agent_token": "1aa3c7557bdcb483f001bf4afe837363ca37e8b2",
+        "name": "NUC Server",
+        "user_token": "620d979546a13748878ce8f288178943ad4be60a"
     },
     "endpoints": {
-        "agent_endpoint": "http://localhost:8000/api/agents/",
-        "metric_endpoint": "http://localhost:8000/api/metrics/"
+        "agent_endpoint": "http://localhost/api/agents/",
+        "metric_endpoint": "http://localhost/api/metrics/"
     },
     "logging": {
         "filename": "monitor.log",
-        "level": "debug"
+        "level": "info"
     },
     "metrics": {
-        "enable_logfile": true,
-        "get_endpoint": true,
+        "enable_logfile": false,
+        "get_endpoint": false,
         "log_filename": "metrics.json",
         "post_interval": 60
     },
@@ -29,7 +29,7 @@
         "backlog": 2048,
         "debug": true,
         "host": "0.0.0.0",
-        "log_level": "debug",
+        "log_level": "info",
         "port": 8080,
         "reload": true,
         "timeout_keep_alive": 5,
