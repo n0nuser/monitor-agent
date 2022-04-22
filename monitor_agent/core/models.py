@@ -2,8 +2,7 @@ import psutil
 import platform
 import time
 import datetime
-
-from monitor_agent.main import logging
+import logging
 
 
 class Status:

@@ -2,11 +2,11 @@ import json
 import uvicorn
 import logging
 import requests
-from .settings import Settings
-from .core.command import Command
 from fastapi import FastAPI, UploadFile
 from fastapi_utils.tasks import repeat_every
-from monitor_agent.core.helper import getLogger
+from settings import Settings
+from core.command import Command
+from core.helper import getLogger
 
 
 try:
@@ -17,7 +17,7 @@ except json.decoder.JSONDecodeError as msg:
 
 getLogger(CONFIG.logging.level, CONFIG.logging.filename)
 
-from .core.metricFunctions import send_metrics, send_metrics_adapter, static, dynamic
+from core.metricFunctions import send_metrics, send_metrics_adapter, static, dynamic
 
 api = FastAPI()
 
@@ -107,7 +107,7 @@ def periodic():
 
 def start():
     """Launched with `poetry run start` at root level"""
-    uviconfig = {"app": "monitor_agent.main:api", "interface": "asgi3"}
+    uviconfig = {"app": "main:api", "interface": "asgi3"}
     uviconfig.update(CONFIG.uvicorn.__dict__)
     uviconfig.pop("__module__", None)
     uviconfig.pop("__dict__", None)
@@ -117,3 +117,7 @@ def start():
         uvicorn.run(**uviconfig)
     except:
         logging.critical("Unable to run server.", exc_info=True)
+
+
+if __name__ == "__main__":
+    start()
