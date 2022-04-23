@@ -16,10 +16,10 @@
         "level": "debug"
     },
     "metrics": {
-        "enable_logfile": true,
-        "get_endpoint": true,
+        "enable_logfile": false,
+        "get_endpoint": false,
         "log_filename": "metrics.json",
-        "post_interval": 30
+        "post_interval": 60
     },
     "thresholds": {
         "cpu_percent": 30,
