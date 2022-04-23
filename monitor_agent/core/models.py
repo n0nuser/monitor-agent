@@ -1,4 +1,6 @@
+import os
 import psutil
+from psutil._common import bytes2human
 import platform
 import time
 import datetime
@@ -18,7 +20,6 @@ class MetricStatic:
     def __init__(self):
         self.cpu_core_physical = psutil.cpu_count(logical=False)
         self.cpu_core_total = psutil.cpu_count(logical=True)
-        self.disk = _disk_list()
         self.ip = _ip_addresses()
         self.boot_date = _boot_date()
         self.host = platform.uname().node
@@ -41,7 +42,7 @@ class MetricDynamic:
             self.battery = None
         self.users = _user_list()
         self.processes = _process(self.ram["total"], self.cpu_percent)
-        self.disk_percent = _disk_percent()
+        self.disk = _disk()
         self.uptime = _uptime()
 
 
@@ -142,23 +143,24 @@ def _ip_addresses():
     return addresses
 
 
-def _disk_percent():
-    p = psutil.Process()
-    io_counters = p.io_counters()
-    disk_usage_process = io_counters[2] + io_counters[3]  # read_bytes + write_bytes
-    disk_io_counter = psutil.disk_io_counters()
-    disk_total = disk_io_counter[2] + disk_io_counter[3]  # read_bytes + write_bytes
-    disk = round(disk_usage_process / disk_total * 100, 2)
-    return disk
-
-
-def _disk_list():
+def _disk():
     disk_list = {}
-    for disk in psutil.disk_partitions(all=False):
+    for part in psutil.disk_partitions(all=False):
+        if os.name == "nt":
+            if "cdrom" in part.opts or part.fstype == "":
+                # skip cd-rom drives with no disk in it; they may raise
+                # ENOENT, pop-up a Windows GUI error for a non-ready
+                # partition or just hang.
+                continue
+        if "loop" in part.device:
+            continue
         try:
-            disk_location = disk.device
-            disk_list[disk_location] = psutil.disk_usage(disk_location)._asdict()
-        except PermissionError as msg:
+            usage = psutil.disk_usage(part.mountpoint)
+            data: dict = usage._asdict()
+            data.update(part._asdict())
+            data.pop("device", None)
+            disk_list[part.device] = data
+        except PermissionError:
             continue
     return disk_list
 
