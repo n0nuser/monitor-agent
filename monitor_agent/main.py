@@ -23,10 +23,10 @@ api = FastAPI()
 
 endpoints = {
     "root": "/",
-    "command": "/command",
-    "metrics": "/metrics",
-    "settings": "/settings",
-    "thresholds": "/thresholds",
+    "command": "/command/",
+    "metrics": "/metrics/",
+    "settings": "/settings/",
+    "thresholds": "/thresholds/",
 }
 
 
@@ -98,7 +98,12 @@ def periodic():
         pass
     if alert:
         try:
-            r = requests.post(CONFIG.alerts.url, json={"alert": alert})
+            alert["agent"] = CONFIG.endpoints.agent_token
+            r = requests.post(
+                CONFIG.alerts.url,
+                json=alert,
+                headers={"Authorization": f"Token {CONFIG.auth.user_token}"}
+            )
         except requests.exceptions.InvalidSchema as e:
             logging.error(
                 f"Agent could not send an alert to {CONFIG.alerts.url}", exc_info=True
