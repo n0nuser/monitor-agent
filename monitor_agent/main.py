@@ -1,3 +1,4 @@
+import contextlib
 import json
 import uvicorn
 import logging
@@ -91,19 +92,22 @@ def periodic():
         alert["cpu_percent"] = metrics["cpu_percent"]
     if metrics["ram"]["percent"] >= CONFIG.thresholds.ram_percent:
         alert["ram_percent"] = metrics["ram"]["percent"]
-    try:
-        if metrics["process"]:
-            alert["processes"] = metrics["process"]
-    except KeyError as msg:
-        pass
+    with contextlib.suppress(KeyError):
+        if metrics["processes"]:
+            alert["processes"] = metrics["processes"]
     if alert:
         try:
-            alert["agent"] = CONFIG.endpoints.agent_token
+            agent_endpoint = CONFIG.endpoints.agent_endpoint
+            agent_token = CONFIG.auth.agent_token
+            agent_token = f"{agent_endpoint}{agent_token}/"
+            alert["agent"] = agent_token
             r = requests.post(
                 CONFIG.alerts.url,
                 json=alert,
-                headers={"Authorization": f"Token {CONFIG.auth.user_token}"}
+                headers={"Authorization": f"Token {CONFIG.auth.user_token}"},
             )
+            logging.debug(f"Alert Response: {r.text}")
+            logging.debug(f"Alert Status Code: {r.status_code}")
         except requests.exceptions.InvalidSchema as e:
             logging.error(
                 f"Agent could not send an alert to {CONFIG.alerts.url}", exc_info=True
@@ -120,7 +124,7 @@ def start():
     uviconfig.pop("__doc__", None)
     try:
         uvicorn.run(**uviconfig)
-    except:
+    except Exception:
         logging.critical("Unable to run server.", exc_info=True)
 
 
