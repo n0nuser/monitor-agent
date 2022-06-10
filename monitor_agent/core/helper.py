@@ -11,18 +11,15 @@ def getLogger(level: str, filename: str):
         "critical": logging.CRITICAL,
     }
     try:
-        if level in translation.keys():
+        if level in translation:
             log_level = translation[level]
         else:
             logging.warning("Level not established in Settings.json")
             log_level = logging.info
     except AttributeError as e:
-        logging.warning(
-            "Level not established in Settings.json.\nDefault Info level will be used.",
-            exc_info=True,
-        )
-        log_level = logging.info
+        logging.warning("Level not established in Settings.json.\nDefault Info level will be used.", exc_info=True)
 
+        log_level = logging.info
     log_filename = ""
     try:
         log_filename = filename
