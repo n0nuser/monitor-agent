@@ -100,7 +100,9 @@ def _process(ram: int, pc_cpu_percent):
             cpu_percent = round(p.cpu_percent(), 2)
             ram_percent = round(p.memory_percent(), 2)
             # logging.debug(f"{p.name()} - {p.username()} - {cpu_percent} - {ram_percent}")
-            if (cpu_percent > threshold and not cpu_percent > pc_cpu_percent) or ram_percent > threshold:
+            if (
+                cpu_percent > threshold and not cpu_percent > pc_cpu_percent
+            ) or ram_percent > threshold:
                 process[p.pid] = {
                     "name": p.name(),
                     "cpu_percent": cpu_percent,
@@ -113,7 +115,9 @@ def _process(ram: int, pc_cpu_percent):
                     # Requires elevated permissions
                     process[p.pid]["path"] = p.exe()
                 except (PermissionError, psutil.AccessDenied):
-                    logging.warning(f"Could not get Username or Path for process {p.name()}")
+                    logging.warning(
+                        f"Could not get Username or Path for process {p.name()}"
+                    )
     return process
 
 
