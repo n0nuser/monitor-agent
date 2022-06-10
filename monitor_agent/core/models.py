@@ -98,8 +98,9 @@ def _process(ram: int, pc_cpu_percent):
     threshold = 10
     for p in psutil.process_iter(["name", "username"]):
         with p.oneshot():
-            cpu_percent = p.cpu_percent()
-            ram_percent = round((p.memory_info().vms / ram) * 100, 2)
+            cpu_percent = round(p.cpu_percent(), 2)
+            ram_percent = round(p.memory_percent(), 2)
+            # logging.debug(f"{p.name()} - {p.username()} - {cpu_percent} - {ram_percent}")
             if (
                 cpu_percent > threshold and not cpu_percent > pc_cpu_percent
             ) or ram_percent > threshold:
