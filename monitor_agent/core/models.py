@@ -1,6 +1,5 @@
 import os
 import psutil
-from psutil._common import bytes2human
 import platform
 import time
 import datetime
@@ -147,12 +146,11 @@ def _ip_addresses():
 def _disk():
     disk_list = {}
     for part in psutil.disk_partitions(all=False):
-        if os.name == "nt":
-            if "cdrom" in part.opts or part.fstype == "":
-                # skip cd-rom drives with no disk in it; they may raise
-                # ENOENT, pop-up a Windows GUI error for a non-ready
-                # partition or just hang.
-                continue
+        if os.name == "nt" and ("cdrom" in part.opts or part.fstype == ""):
+            # skip cd-rom drives with no disk in it; they may raise
+            # ENOENT, pop-up a Windows GUI error for a non-ready
+            # partition or just hang.
+            continue
         if "loop" in part.device:
             continue
         try:

@@ -3,9 +3,9 @@
         "url": "http://localhost:8000/api/alerts/"
     },
     "auth": {
-        "agent_token": "1b08ef6ec3af737bcc443050a3556638251abfe6",
+        "agent_token": "2856d26ac5a9bb62a7856bd62350dea27e89fa97",
         "name": "Laptop",
-        "user_token": "248418e0f543ad2d55144862c4f9583144c641bd"
+        "user_token": "9c39b95be95ae86ce0fce14eacc60d875aa8f76c"
     },
     "endpoints": {
         "agent_endpoint": "http://localhost:8000/api/agents/",
@@ -13,7 +13,7 @@
     },
     "logging": {
         "filename": "monitor.log",
-        "level": "debug"
+        "level": "info"
     },
     "metrics": {
         "enable_logfile": false,
@@ -22,14 +22,14 @@
         "post_interval": 60
     },
     "thresholds": {
-        "cpu_percent": 30,
+        "cpu_percent": 50,
         "ram_percent": 30
     },
     "uvicorn": {
         "backlog": 2048,
-        "debug": true,
+        "debug": false,
         "host": "0.0.0.0",
-        "log_level": "debug",
+        "log_level": "trace",
         "port": 8080,
         "reload": true,
         "timeout_keep_alive": 5,
