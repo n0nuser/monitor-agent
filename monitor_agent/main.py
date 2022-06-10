@@ -1,13 +1,13 @@
-import contextlib
-import json
-import uvicorn
-import logging
-import requests
+from core.command import Command
+from core.helper import getLogger
 from fastapi import FastAPI, UploadFile
 from fastapi_utils.tasks import repeat_every
 from settings import Settings
-from core.command import Command
-from core.helper import getLogger
+import contextlib
+import json
+import logging
+import requests
+import uvicorn
 
 
 try:
@@ -108,10 +108,8 @@ def periodic():
             )
             logging.debug(f"Alert Response: {r.text}")
             logging.debug(f"Alert Status Code: {r.status_code}")
-        except requests.exceptions.InvalidSchema as e:
-            logging.error(
-                f"Agent could not send an alert to {CONFIG.alerts.url}", exc_info=True
-            )
+        except requests.exceptions.InvalidSchema:
+            logging.error(f"Agent could not send an alert to {CONFIG.alerts.url}", exc_info=True)
 
 
 def start():

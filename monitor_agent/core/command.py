@@ -2,14 +2,13 @@ import subprocess
 import typing
 import time
 import os
+import re
 
 
 class Command:
     def __init__(self, command: str, timeout: int):
         self.command = command
-        self.stdout, self.stderr, self.timeout, self.elapsed_time = _executeCommand(
-            command, timeout
-        )
+        self.timeout, self.elapsed_time, self.stdout, self.stderr = _executeCommand(command, timeout)
 
 
 def _executeCommand(command: str, timeout: int) -> typing.Tuple[str, str, int, float]:
@@ -104,10 +103,26 @@ def _executeCommand(command: str, timeout: int) -> typing.Tuple[str, str, int, f
     except (subprocess.CalledProcessError, subprocess.TimeoutExpired) as msg:
         process = msg
     except (ValueError, FileNotFoundError) as msg:
-        end_time = round(time.time() - start_time, 2)
+        end_time = time.time() - start_time
         return "", msg.strerror, timeout, end_time
 
-    end_time = round(time.time() - start_time, 2)
-    process.stdout = "" if process.stdout is None else process.stdout
-    process.stderr = "" if process.stderr is None else process.stderr
-    return process.stdout, process.stderr, timeout, end_time
+    end_time = time.time() - start_time
+
+    ansi_escape = re.compile(r'(?:\x1B[@-Z\\-_]|[\x80-\x9A\x9C-\x9F]|(?:\x1B\[|\x1b\(|\x1b=|\x9B)[0-?]*[ -/]*[@-~])')
+    if process.stdout:
+        if not isinstance(process.stdout, str):
+            stdout = process.stdout.decode("utf-8", "ignore")
+            stdout = ansi_escape.sub('', stdout).replace("\n", "<br>")
+            process.stdout = stdout
+    else:
+        process.stdout = ""
+
+    if process.stderr:
+        if not isinstance(process.stderr, str):
+            stderr = process.stderr.decode("utf-8", "ignore")
+            stderr = ansi_escape.sub('', stderr).replace("\n", "<br>")
+            process.stderr = stderr
+    else:
+        process.stderr = ""
+
+    return timeout, end_time, process.stdout, process.stderr

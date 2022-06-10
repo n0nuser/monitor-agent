@@ -75,10 +75,8 @@ def send_metrics(
         )
         logging.debug(f"Metric Response: {r.text}")
         logging.debug(f"Metric Status Code: {r.status_code}")
-    except (MaxRetryError, NewConnectionError, ConnectionError, InvalidSchema) as e:
-        logging.critical(
-            f"Agent could not send metrics to server {metric_endpoint}", exc_info=True
-        )
+    except (MaxRetryError, NewConnectionError, ConnectionError, InvalidSchema):
+        logging.critical(f"Agent could not send metrics to server {metric_endpoint}", exc_info=True)
 
     if file_enabled:
         with open(file_path, "w") as f:
