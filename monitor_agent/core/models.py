@@ -94,7 +94,7 @@ def _cur_network_traffic(interval=1):
 
 def _process(ram: int, pc_cpu_percent):
     process = {}
-    threshold = 10
+    threshold = 5
     for p in psutil.process_iter(["name", "username"]):
         with p.oneshot():
             cpu_percent = round(p.cpu_percent(), 2)
