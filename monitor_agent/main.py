@@ -1,6 +1,7 @@
 from core.command import Command
 from core.helper import getLogger
-from fastapi import FastAPI, UploadFile
+from fastapi import FastAPI, UploadFile, HTTPException, Depends
+from fastapi.security import HTTPBasic, HTTPBasicCredentials
 from fastapi_utils.tasks import repeat_every
 from settings import Settings
 import contextlib
@@ -21,6 +22,7 @@ getLogger(CONFIG.logging.level, CONFIG.logging.filename)
 from core.metricFunctions import send_metrics, send_metrics_adapter, static, dynamic
 
 api = FastAPI()
+security = HTTPBasic()
 
 endpoints = {
     "root": "/",
@@ -31,33 +33,43 @@ endpoints = {
 }
 
 
+async def check_credentials(credentials: HTTPBasicCredentials = Depends(security)):
+    if credentials.username != "monitor" and credentials.password != CONFIG.auth.user_token:
+        raise HTTPException(status_code=401, detail="Incorrect credentials")
+
+
 # GET
 @api.get(endpoints["root"])
-async def root():
+async def root(credentials: HTTPBasicCredentials = Depends(security)):
+    await check_credentials(credentials)
     return {"endpoints": endpoints}
 
 
 @api.get(endpoints["thresholds"])
-async def thresholds():
+async def thresholds(credentials: HTTPBasicCredentials = Depends(security)):
+    await check_credentials(credentials)
     return {"thresholds": CONFIG.thresholds.__dict__}
 
 
 if CONFIG.metrics.get_endpoint:
 
     @api.get(endpoints["metrics"])
-    async def metrics_endpoint():
+    async def metrics_endpoint(credentials: HTTPBasicCredentials = Depends(security)):
+        await check_credentials(credentials)
         elapsed_time, data = send_metrics_adapter([static, dynamic])
         return {"data": data, "elapsed_time": elapsed_time}
 
 
 # POST
 @api.post(endpoints["command"])
-async def command(command: str, timeout: int):
+async def command(command: str, timeout: int, credentials: HTTPBasicCredentials = Depends(security)):
+    await check_credentials(credentials)
     return Command(command, timeout).__dict__
 
 
 @api.post(endpoints["settings"])
-async def mod_settings(settings: UploadFile):
+async def mod_settings(settings: UploadFile, credentials: HTTPBasicCredentials = Depends(security)):
+    await check_credentials(credentials)
     global CONFIG
     data: str = settings.file.read().decode()
     msg = CONFIG.write_settings(data)
@@ -87,15 +99,15 @@ def periodic():
         name=CONFIG.auth.name,
     )
 
-    alert = {}
-    if metrics["cpu_percent"] >= CONFIG.thresholds.cpu_percent:
-        alert["cpu_percent"] = metrics["cpu_percent"]
-    if metrics["ram"]["percent"] >= CONFIG.thresholds.ram_percent:
-        alert["ram_percent"] = metrics["ram"]["percent"]
+    alert = {"cpu_percent": metrics["cpu_percent"], "ram_percent": metrics["ram"]["percent"]}
+
     with contextlib.suppress(KeyError):
         if metrics["processes"]:
             alert["processes"] = metrics["processes"]
-    if alert:
+    if (
+        metrics["cpu_percent"] >= CONFIG.thresholds.cpu_percent
+        or metrics["ram"]["percent"] >= CONFIG.thresholds.ram_percent
+    ):
         try:
             agent_endpoint = CONFIG.endpoints.agent_endpoint
             agent_token = CONFIG.auth.agent_token
@@ -109,9 +121,7 @@ def periodic():
             logging.debug(f"Alert Response: {r.text}")
             logging.debug(f"Alert Status Code: {r.status_code}")
         except requests.exceptions.InvalidSchema:
-            logging.error(
-                f"Agent could not send an alert to {CONFIG.alerts.url}", exc_info=True
-            )
+            logging.error(f"Agent could not send an alert to {CONFIG.alerts.url}", exc_info=True)
 
 
 def start():
