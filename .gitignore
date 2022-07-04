@@ -2,3 +2,4 @@ __pycache__
 *.pyc
 monitor-agent.log
 monitor.log
+metrics.json
