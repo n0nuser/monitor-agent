@@ -7,15 +7,16 @@ import logging
 
 
 class Status:
-    # def __init__(self, error_code, error_message, elapsed):
+    """Stores the timestamp and the elapsed time"""
+
     def __init__(self, elapsed):
         self.timestamp = datetime.datetime.now().isoformat()
-        # self.error_code = error_code
-        # self.error_message = error_message
         self.elapsed = elapsed
 
 
 class MetricStatic:
+    """Metrics that never or rarely change."""
+
     def __init__(self):
         self.cpu_core_physical = psutil.cpu_count(logical=False)
         self.cpu_core_total = psutil.cpu_count(logical=True)
@@ -28,6 +29,8 @@ class MetricStatic:
 
 
 class MetricDynamic:
+    """Metrics that are in constant change."""
+
     def __init__(self):
         self.cpu_freq = psutil.cpu_freq()._asdict()
         self.cpu_percent = psutil.cpu_percent()
@@ -40,40 +43,41 @@ class MetricDynamic:
             # If no battery is installed or metrics can’t be determined None is returned.
             self.battery = None
         self.users = _user_list()
-        self.processes = _process(self.ram["total"], self.cpu_percent)
+        self.processes = _process(self.cpu_percent)
         self.disk = _disk()
         self.uptime = _uptime()
 
 
 def _format_timestamp(date: float):
-    """_summary_
+    """Format a datetime object to a ISO 8601 string.
 
     Args:
         date (float): Date in seconds
 
     Returns:
-        string: Timestamp in ISO format 'YYYY-MM-DD HH:MM:SS.mmmmmm'
+        str: Timestamp in ISO format 'YYYY-MM-DD HH:MM:SS.mmmmmm'
     """
     return datetime.datetime.fromtimestamp(date).isoformat()
 
 
 def _uptime():
-    """_summary_
+    """Returns Uptime in format "HH:MM:SS"
 
     Returns:
-        string: Returns Uptime in format "HH:MM:SS"
+        str: Uptime
     """
-    return str(datetime.timedelta(seconds=(time.time() - psutil.boot_time())))
+    uptime_in_seconds: float = time.time() - psutil.boot_time()
+    return str(datetime.timedelta(seconds=uptime_in_seconds))
 
 
 def _cur_network_traffic(interval=1):
-    """_summary_
+    """Returns Actual Network traffic whithin an specified interval.
 
     Args:
         interval (int, optional): Interval to wait for packet frames to be captured. Defaults to 1.
 
     Returns:
-        tuple[str, str]: _description_
+        tuple[str, str]: Current Incoming and Outgoing Network traffic in bytes
     """
     # Get net in/out
     net1_out = psutil.net_io_counters().bytes_sent
@@ -92,16 +96,26 @@ def _cur_network_traffic(interval=1):
     return current_in, current_out
 
 
-def _process(ram: int, pc_cpu_percent):
+def _process(pc_cpu_percent: float) -> dict:
+    """Retrieves processes that exceed a 5% of CPU or RAM usage.
+
+    Args:
+        pc_cpu_percent (float): CPU usage percentage of the host.
+                                Used to determine if a process has correct CPU usage values.
+
+    Returns:
+        dict: Dictionary with processes that exceed 5% of CPU or RAM usage.
+              Format is: {pid: {name: str, cpu_percent: float, memory_percent: float, ppid: int}}
+    """
     process = {}
     threshold = 5
     for p in psutil.process_iter(["name", "username"]):
         with p.oneshot():
             cpu_percent = round(p.cpu_percent(), 2)
             ram_percent = round(p.memory_percent(), 2)
-            # logging.debug(f"{p.name()} - {p.username()} - {cpu_percent} - {ram_percent}")
+
             if (
-                cpu_percent > threshold and not cpu_percent > pc_cpu_percent
+                cpu_percent > threshold and cpu_percent <= pc_cpu_percent
             ) or ram_percent > threshold:
                 process[p.pid] = {
                     "name": p.name(),
@@ -109,6 +123,7 @@ def _process(ram: int, pc_cpu_percent):
                     "ram_percent": ram_percent,
                     "ppid": p.ppid(),
                 }
+
                 try:
                     # Requires elevated permissions SOMETIMES
                     process[p.pid]["username"] = p.username()
@@ -127,12 +142,21 @@ def _total_network_traffic():
     return net_io.bytes_recv, net_io.bytes_sent
 
 
-def _boot_date():
-    boot_time_timestamp = psutil.boot_time()
-    return _format_timestamp(boot_time_timestamp)
+def _boot_date() -> str:
+    """Boot date in ISO format 'YYYY-MM-DD HH:MM:SS.mmmmmm'
+
+    Returns:
+        str: Boot date.
+    """
+    return _format_timestamp(psutil.boot_time())
 
 
-def _ip_addresses():
+def _ip_addresses() -> dict:
+    """IP addresses of the host.
+
+    Returns:
+        dict: IP addresses of the host.
+    """
     addresses = {}
     for key, value in psutil.net_if_addrs().items():
         ifaces = {}
@@ -143,7 +167,12 @@ def _ip_addresses():
     return addresses
 
 
-def _disk():
+def _disk() -> dict:
+    """Disks of the host with its partitions.
+
+    Returns:
+        dict: Disks of the host with its partitions.
+    """
     disk_list = {}
     for part in psutil.disk_partitions(all=False):
         if os.name == "nt" and ("cdrom" in part.opts or part.fstype == ""):
@@ -164,9 +193,14 @@ def _disk():
     return disk_list
 
 
-def _user_list():
+def _user_list() -> dict:
+    """List of logged users.
+
+    Returns:
+        dict: List of logged users.
+    """
     users = {}
     for index, value in enumerate(psutil.users()):
         users[index] = value._asdict()
-        users[index]["started"] = _format_timestamp(value._asdict()["started"])
+        users[index]["started"] = _format_timestamp(value._asdict().get("started", ""))
     return users
