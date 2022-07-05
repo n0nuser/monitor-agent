@@ -83,6 +83,7 @@ def toObj(item) -> object:
         return item
 
 
+
 def _write_to_json(data: dict, path: str):
     """Given a dictionary, write it to a json file with 4 space indentation.
 
