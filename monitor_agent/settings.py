@@ -83,7 +83,8 @@ def toObj(item) -> object:
         return item
 
 
-def _write_to_json(data: dict, path: str) -> typing.Tuple(str, dict):
+
+def _write_to_json(data: dict, path: str):
     """Given a dictionary, write it to a json file with 4 space indentation.
 
     Args:
@@ -91,7 +92,7 @@ def _write_to_json(data: dict, path: str) -> typing.Tuple(str, dict):
         path (str): Path to the file
 
     Returns:
-        typing.Tuple(str, dict): Data written to the file; and the dictionary itself
+        (str, dict): Data written to the file; and the dictionary itself
     """
     f = open(path, "w")
     data_str: str = json.dumps(data, indent=4, sort_keys=True)
