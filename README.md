@@ -129,7 +129,7 @@ sudo systemctl restart agent.service
 
 Check the [Roadmap here](https://github.com/n0nuser/Monitor-Agent/issues/5).
 
-See the [open issues](https://github.com/othneildrew/Best-README-Template/issues) for a full list of proposed features (and known issues).
+See the [open issues](https://github.com/n0nuser/Monitor-Agent/issues) for a full list of proposed features (and known issues).
 
 <p align="right">(<a href="#top">back to top</a>)</p>
 
