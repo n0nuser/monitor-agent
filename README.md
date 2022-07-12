@@ -53,7 +53,13 @@ You can always update the configuration with a form in the Web App.
 
 ## Installation
 
-First, install the Python dependencies:
+First, donwload the repository into your `home` folder or the directory you prefer:
+
+```bash
+git clone https://github.com/n0nuser/monitor-agent
+```
+
+Install the Python dependencies:
 
 ```bash
 pip3 install -r requirements.txt
@@ -72,10 +78,16 @@ Requires=network-online.target
 [Service]
 RemainAfterExit=true
 Restart=on-failure
-ExecStart=/usr/bin/python3 /home/MYUSER/DIRECTORY/monitor_agent/monitor_agent/main.py
+ExecStart=/usr/bin/python3 /home/MYUSER/monitor_agent/monitor_agent/main.py
 
 [Install]
 WantedBy=multi-user.target
 ```
 
-Modify `MYUSER` with your user, and `DIRECTORY` with the path to the `main.py`.
+Modify `MYUSER` with your user, and `DIRECTORY` with the path to the `main.py`. In case you downloaded the repository in your Home folder you wouldn't need to change the directory in the service file.
+
+Once the service is installed, you can enable it to run forever and start on startup:
+
+```bash
+sudo systemctl enable agent.service
+```
