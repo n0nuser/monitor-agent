@@ -2,7 +2,8 @@
 
 Final Degree Project - Host to monitor
 
-## Agent configuration
+
+## Configuration
 
 The user can configure the agent and server settings with the `settings.json` file:
 
@@ -49,3 +50,32 @@ The user can configure the agent and server settings with the `settings.json` fi
 
 It's best to use the configurator from the Monitor Web App as it automatically generates it with the approppiate configuration.
 You can always update the configuration with a form in the Web App.
+
+## Installation
+
+First, install the Python dependencies:
+
+```bash
+pip3 install -r requirements.txt
+```
+
+Then, create a SystemD service in `/etc/systemd/system/` called `agent.service`.
+
+`/etc/systemd/system/agent.service`:
+
+```service
+[Unit]
+Description=RESTful web to track agents
+After=network.target network-online.target
+Requires=network-online.target
+
+[Service]
+RemainAfterExit=true
+Restart=on-failure
+ExecStart=/usr/bin/python3 /home/MYUSER/DIRECTORY/monitor_agent/monitor_agent/main.py
+
+[Install]
+WantedBy=multi-user.target
+```
+
+Modify `MYUSER` with your user, and `DIRECTORY` with the path to the `main.py`.
