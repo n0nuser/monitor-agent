@@ -17,7 +17,7 @@ Computer Science Final Degree Project @ USAL - Host to monitor
 
 [![Python][Python]][Python-url] [![PSUtils][PSUtils]][PSUtils-url] [![Poetry][Poetry]][Poetry-url]
 
-[![FastAPI][FastAPI]][FastAPI-url] [![FastAPI Utils][FastAPI-Utils]][FastAPI-Utils-url]
+[![FastAPI][FastAPI]][FastAPI-url] [![FastAPI Utils][FastAPI-Utils]][FastAPI-Utils-url] [![Uvicorn][Uvicorn]][Uvicorn-url]
 
 
 <p align="right">(<a href="#top">back to top</a>)</p>
@@ -198,3 +198,5 @@ Project Link: [https://github.com/n0nuser/Monitor-Agent](https://github.com/n0nu
 [PSUtils-url]: https://psutil.readthedocs.io/en/latest/
 [Poetry]: https://img.shields.io/badge/Poetry-3670A0?style=for-the-badge&logo=poetry&logoColor=ffdd54
 [Poetry-url]: https://python-poetry.org/
+[Uvicorn]: https://img.shields.io/badge/uvicorn-%298729.svg?style=for-the-badge&logo=gunicorn&logoColor=white
+[Uvicorn-url]: https://www.uvicorn.org/
