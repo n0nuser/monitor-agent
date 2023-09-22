@@ -1,28 +1,16 @@
 [tool.poetry]
-name = "monitor_agent"
-version = "0.1.0"
-description = "Monitor agent that sends and receives metrics and info from the REST API server."
-authors = ["Pablo González Rubio <pjgr2000@gmail.com>"]
-license = "GNU General Public License v3.0"
-packages = [
-    { include = "monitor_agent"},
-    { include = "monitor_agent/**/*.py" },
-]
+name = "monitor-agent"
+version = "0.2.0"
+description = "Agent executed on a host that retrieves metrics. Exposes an OAS3 API and is able to send the metrics remotely periodically."
+authors = ["Pablo Jesús González Rubio <gonzrubio.pablo@gmail.com>"]
+license = "MIT"
+packages = [{ include = "monitor_agent" }]
 
 [tool.poetry.dependencies]
-python = ">=3.7,<4.0.0"
-requests = "^2.27.1"
-psutil = "^5.9.0"
-fastapi = "^0.74.1"
-fastapi-utils = "^0.2.1"
-uvicorn = "^0.17.4"
-python-multipart = "^0.0.5"
-
-[tool.poetry.dev-dependencies]
-pytest = "^7.0.0"
-tox = "^3.24.5"
-flake8 = "^4.0.1"
-black = {version = "^22.3.0", allow-prereleases = true}
+python = ">=3.9,<4.0.0"
+litestar = "^2.0.1"
+psutil = "^5.9.5"
+python-multipart = "^0.0.6"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]

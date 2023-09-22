@@ -1,0 +1,10 @@
+[flake8]
+select = C,E,F,W,B,B9
+ignore = E501, W503
+exclude =
+    __init__.py,
+    .venv,
+    venv,
+    __pycache__,
+    .github,
+    .vscode,
