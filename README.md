@@ -2,7 +2,9 @@
 
 # Monitor: Agent
 
-Computer Science Final Degree Project @ USAL - Host to monitor
+Python Agent executed on a host that retrieves metrics. Exposes an OAS3 API and is able to send the metrics remotely periodically.
+
+This is a modern revision of the project. For the original Final Year Project, check the [`fyp` branch](https://github.com/n0nuser/monitor-agent/tree/fyp).
 
 [![Contributors][contributors-shield]][contributors-url]
 [![Forks][forks-shield]][forks-url]
@@ -11,17 +13,13 @@ Computer Science Final Degree Project @ USAL - Host to monitor
 [![GPL License][license-shield]][license-url]
 [![LinkedIn][linkedin-shield]][linkedin-url]
 
-
-
-### Built With
+## Built With
 
 [![Python][Python]][Python-url] [![PSUtils][PSUtils]][PSUtils-url] [![Poetry][Poetry]][Poetry-url]
 
-[![FastAPI][FastAPI]][FastAPI-url] [![FastAPI Utils][FastAPI-Utils]][FastAPI-Utils-url] [![Uvicorn][Uvicorn]][Uvicorn-url]
-
+[![LiteStar][LiteStar]][LiteStar-url] [![Uvicorn][Uvicorn]][Uvicorn-url]
 
 <p align="right">(<a href="#top">back to top</a>)</p>
-
 
 ## Getting Started
 
@@ -113,27 +111,20 @@ The user can configure the agent and server settings with the `settings.json` fi
 }
 ```
 
-It's best to use the configurator from the Monitor Web App as it automatically generates it with the approppiate configuration.
-You can always update the configuration with a form in the Web App.
-
 Once configured, restart the service:
 
 ```bash
 sudo systemctl restart agent.service
 ```
 
-
-
 <!-- ROADMAP -->
 ## Roadmap
 
-Check the [Roadmap here](https://github.com/n0nuser/Monitor-Agent/issues/5).
+Check the [Roadmap here](https://github.com/n0nuser/monitor-agent/issues/5).
 
-See the [open issues](https://github.com/n0nuser/Monitor-Agent/issues) for a full list of proposed features (and known issues).
+See the [open issues](https://github.com/n0nuser/monitor-agent/issues) for a full list of proposed features (and known issues).
 
 <p align="right">(<a href="#top">back to top</a>)</p>
-
-
 
 <!-- CONTRIBUTING -->
 ## Contributing
@@ -151,8 +142,6 @@ Don't forget to give the project a star! Thanks again!
 
 <p align="right">(<a href="#top">back to top</a>)</p>
 
-
-
 <!-- LICENSE -->
 ## License
 
@@ -160,40 +149,34 @@ Distributed under the GPL-3.0 License. See `LICENSE.txt` for more information.
 
 <p align="right">(<a href="#top">back to top</a>)</p>
 
-
-
 <!-- CONTACT -->
 ## Contact
 
-Pablo González Rubio - [@n0nuser_](https://twitter.com/n0nuser_) - gonzrubio.pablo@gmail.com
+Pablo González Rubio - [@n0nuser_](https://twitter.com/n0nuser_) - <gonzrubio.pablo@gmail.com>
 
-Project Link: [https://github.com/n0nuser/Monitor-Agent](https://github.com/n0nuser/Monitor-Agent)
+Project Link: [https://github.com/n0nuser/monitor-agent](https://github.com/n0nuser/monitor-agent)
 
 <p align="right">(<a href="#top">back to top</a>)</p>
-
-
 
 <!-- MARKDOWN LINKS & IMAGES -->
 <!-- https://www.markdownguide.org/basic-syntax/#reference-style-links -->
 [contributors-shield]: https://img.shields.io/github/contributors/n0nuser/monitor-agent?style=for-the-badge
-[contributors-url]: https://github.com/n0nuser/Monitor-Agent/graphs/contributors
+[contributors-url]: https://github.com/n0nuser/monitor-agent/graphs/contributors
 [forks-shield]: https://img.shields.io/github/forks/n0nuser/monitor-agent?style=for-the-badge
-[forks-url]: https://github.com/n0nuser/Monitor-Agent/network/members
+[forks-url]: https://github.com/n0nuser/monitor-agent/network/members
 [stars-shield]: https://img.shields.io/github/stars/n0nuser/monitor-agent?style=for-the-badge
-[stars-url]: https://github.com/n0nuser/Monitor-Agent/stargazers
+[stars-url]: https://github.com/n0nuser/monitor-agent/stargazers
 [issues-shield]: https://img.shields.io/github/issues/n0nuser/monitor-agent?style=for-the-badge
-[issues-url]: https://github.com/n0nuser/Monitor-Agent/issues
+[issues-url]: https://github.com/n0nuser/monitor-agent/issues
 [license-shield]: https://img.shields.io/github/license/n0nuser/monitor-agent?style=for-the-badge
-[license-url]: https://github.com/n0nuser/Monitor-Agent/blob/main/LICENSE.txt
+[license-url]: https://github.com/n0nuser/monitor-agent/blob/main/LICENSE.txt
 [linkedin-shield]: https://img.shields.io/badge/-LinkedIn-black.svg?style=for-the-badge&logo=linkedin&colorB=555
 [linkedin-url]: https://linkedin.com/in/nonuser
 
 [Python]: https://img.shields.io/badge/python-3670A0?style=for-the-badge&logo=python&logoColor=ffdd54
 [Python-url]: https://www.python.org/
-[FastAPI]: https://img.shields.io/badge/FastAPI-005571?style=for-the-badge&logo=fastapi
-[FastAPI-url]: https://fastapi.tiangolo.com/
-[FastAPI-Utils]: https://img.shields.io/badge/FastAPI%20Utils-005571?style=for-the-badge&logo=fastapi
-[FastAPI-Utils-url]: https://fastapi-utils.davidmontague.xyz/
+[LiteStar]: https://img.shields.io/badge/LiteStar-005571?style=for-the-badge&logo=litestar
+[LiteStar-url]: https://litestar.dev/
 [PSUtils]: https://img.shields.io/badge/PSUtils-3670A0?style=for-the-badge&logo=python&logoColor=ffdd54
 [PSUtils-url]: https://psutil.readthedocs.io/en/latest/
 [Poetry]: https://img.shields.io/badge/Poetry-3670A0?style=for-the-badge&logo=poetry&logoColor=ffdd54
