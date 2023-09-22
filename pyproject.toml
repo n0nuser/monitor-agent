@@ -11,6 +11,8 @@ python = ">=3.9,<4.0.0"
 litestar = "^2.0.1"
 psutil = "^5.9.5"
 python-multipart = "^0.0.6"
+pydantic = "^2.3.0"
+pydantic-settings = "^2.0.3"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
