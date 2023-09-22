@@ -53,12 +53,6 @@ repos:
     rev: "v1.4.1"
     hooks:
       - id: mypy
-        exclude: "app/db/alembic"
-  - repo: https://github.com/RobertCraigie/pyright-python
-    rev: v1.1.316
-    hooks:
-      - id: pyright
-        exclude: "app/db/alembic"
   - repo: https://github.com/python-poetry/poetry
     rev: "1.3.0"
     hooks:
