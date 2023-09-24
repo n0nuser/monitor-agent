@@ -3,9 +3,9 @@
         "url": "http://localhost:8000/api/alerts/"
     },
     "auth": {
-        "agent_token": "fb79210dd15ea00aeeb4bb21f81b27421a4e11a7",
+        "agent_token": "fb79210dd15ea00aeeb4bb21f81b2742",
         "name": "Laptop",
-        "user_token": "19fc6e57b8fb0e5a1a7b55976952ab02865aa771"
+        "user_token": "19fc6e57b8fb0e5a1a7b55976952ab02"
     },
     "endpoints": {
         "agent_endpoint": "http://localhost:8000/api/agents/",
