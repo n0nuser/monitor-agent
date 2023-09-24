@@ -1,9 +1,12 @@
+from functools import lru_cache
 import json
 from pathlib import Path
 from uuid import UUID
 
 from pydantic import BaseModel
 from pydantic_settings import BaseSettings, SettingsConfigDict
+
+from monitor_agent.logger import LOGGER
 
 directory = Path(__file__).resolve().parent
 abs_file_path = directory / "settings.json"
@@ -82,5 +85,24 @@ class Settings(BaseSettings):
     thresholds: ThresholdsConfig
     uvicorn: UvicornConfig
 
+    def write_settings(self) -> None:
+        """Writes the settings to the settings.json file."""
+        try:
+            with open(abs_file_path, "w", encoding="UTF-8") as file_stream:
+                file_stream.write(self.model_dump_json(indent=4, exclude_unset=True))
+                clear_settings_cache()
+        except Exception as error:
+            LOGGER.critical("Error writing settings: %s", error, exc_info=True)
 
-SETTINGS = Settings.model_validate_json(json.dumps(abs_file_path))
+
+@lru_cache()
+def get_settings() -> Settings:
+    """Gets the settings from the settings.json file."""
+    with open(abs_file_path, "r", encoding="UTF-8") as file_stream:
+        json_data = json.load(file_stream)
+    return Settings.model_validate_json(json.dumps(json_data))
+
+
+def clear_settings_cache() -> None:
+    """Clears the cache for the get_settings function."""
+    get_settings.cache_clear()
